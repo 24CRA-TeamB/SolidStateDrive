@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ssd.DeviceDriver;
+import ssd.SSDInterface;
 import ssd.SamsungSSD;
 
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -16,17 +17,10 @@ import static org.mockito.Mockito.verify;
 class TestShellScriptTest {
 
     @Mock
-    private SamsungSSD ssdInterface;
-
     private DeviceDriver deviceDriver;
 
     @BeforeEach
     void setUp() {
-        deviceDriver = new DeviceDriver(ssdInterface);
-    }
-
-    @Test
-    void main() {
     }
 
     @Test
@@ -43,14 +37,14 @@ class TestShellScriptTest {
 
         TestShellScript.read(input);
 
-        verify(ssdInterface, times(1)).read(input);
+        verify(deviceDriver, times(1)).readData(input);
     }
 
     @Test
     void fullRead() {
         TestShellScript.fullRead();
 
-        verify(ssdInterface, times(100)).read(anyInt());
+        verify(deviceDriver, times(100)).readData(anyInt());
     }
 
     @Test
