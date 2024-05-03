@@ -1,15 +1,19 @@
-package java.shell;
+package shell;
 
 import org.assertj.core.util.VisibleForTesting;
 
 import java.ssd.DeviceDriver;
 import java.ssd.SamsungSSD;
+import java.util.Scanner;
 
 public class TestShellScript {
     public static void main(String[] args) {
-        DeviceDriver deviceDriver = new DeviceDriver(new SamsungSSD());
-        deviceDriver.writeData(10, 10);
-        deviceDriver.readData(10);
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            String input = scanner.nextLine();
+            
+        }
     }
 
     @VisibleForTesting
