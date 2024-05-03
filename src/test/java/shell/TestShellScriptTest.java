@@ -13,8 +13,9 @@ import ssd.SSDInterface;
 
 import java.util.stream.Stream;
 
-import static org.mockito.Mockito.*;
-
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class TestShellScriptTest {
@@ -43,10 +44,18 @@ class TestShellScriptTest {
 
     @Test
     void read() {
+        String lba = "10";
+
+        TestShellScript.read(lba);
+
+        verify(mockDeviceDriver, times(1)).readData(lba);
     }
 
     @Test
-    void fullread() {
+    void fullRead() {
+        TestShellScript.fullRead();
+
+        verify(mockDeviceDriver, times(100)).readData(anyString());
     }
 
     @Test
