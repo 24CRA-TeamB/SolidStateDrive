@@ -3,12 +3,12 @@ package ssd;
 public class SamsungSSD implements SSDInterface{
 
     @Override
-    public void read(int lba) {
+    public void read(String lba) {
         //File Read
     }
 
     @Override
-    public void write(int lba, int data) {
+    public void write(String lba, String data) {
         //File Write
     }
 }

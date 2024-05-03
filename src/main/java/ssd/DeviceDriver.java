@@ -7,11 +7,11 @@ public class DeviceDriver {
         this.ssdInterface = ssdInterface;
     }
 
-    public void readData(int lba){
+    public void readData(String lba){
         ssdInterface.read(lba);
     }
 
-    public void writeData(int lba, int data){
+    public void writeData(String lba, String data){
         ssdInterface.write(lba, data);
     }
 }
