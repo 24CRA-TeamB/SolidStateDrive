@@ -1,21 +1,44 @@
 package shell;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import ssd.DeviceDriver;
+import ssd.SSDInterface;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.stream.Stream;
 
+import static org.mockito.Mockito.*;
+
+
+@ExtendWith(MockitoExtension.class)
 class TestShellScriptTest {
 
-    @Test
-    void main() {
+    @Mock
+    DeviceDriver mockDeviceDriver;
+
+    @BeforeEach
+    void setUp() {
+        TestShellScript.setDeviceDriver(mockDeviceDriver);
     }
 
-    @Test
-    void write() {
+    @ParameterizedTest
+    @MethodSource("getLBAandDataList")
+    void writeNormally(String lba, String data) {
+        TestShellScript.write(lba, data);
+        verify(mockDeviceDriver, times(1)).writeData(lba, data);
     }
 
-    @Test
-    void fullwrite() {
+    @ParameterizedTest
+    @MethodSource("getDataList")
+    void fullwriteNormally(String data) {
+        TestShellScript.fullwrite(data);
+        verify(mockDeviceDriver, times(TestShellScript.NUMBER_OF_LBA)).writeData(anyString(), matches(data));
     }
 
     @Test
@@ -32,5 +55,21 @@ class TestShellScriptTest {
 
     @Test
     void help() {
+    }
+
+    static Stream<Arguments> getLBAandDataList() {
+        return Stream.of(
+                Arguments.arguments("0", "0x00000000"),
+                Arguments.arguments("3", "0xAAAABBBB"),
+                Arguments.arguments("99", "0xFFFFFFFF")
+        );
+    }
+
+    static Stream<Arguments> getDataList() {
+        return Stream.of(
+                Arguments.arguments("0x00000000"),
+                Arguments.arguments("0xAAAABBBB"),
+                Arguments.arguments("0xFFFFFFFF")
+        );
     }
 }
