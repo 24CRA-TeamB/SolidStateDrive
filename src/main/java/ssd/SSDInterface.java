@@ -1,4 +1,4 @@
-package java.ssd;
+package ssd;
 
 public interface SSDInterface {
     void read(int lba);

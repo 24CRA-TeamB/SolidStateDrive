@@ -1,4 +1,4 @@
-package java.ssd;
+package ssd;
 
 public class SamsungSSD implements SSDInterface{
 

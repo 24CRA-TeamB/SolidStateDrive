@@ -1,7 +1,7 @@
-package java.shell;
+package shell;
 
-import java.ssd.DeviceDriver;
-import java.ssd.SamsungSSD;
+import ssd.DeviceDriver;
+import ssd.SamsungSSD;
 
 public class TestShellScript {
     public static void main(String[] args) {
