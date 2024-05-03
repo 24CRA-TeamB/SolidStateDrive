@@ -46,5 +46,15 @@ class SamsungSSDTest {
                 assertThat(e).isInstanceOf(RuntimeException.class);
             }
         }
+
+        @Test
+        @DisplayName("data 값에 prefix 0x 값이 아닌 경우 RuntimeException")
+        void writeThrowRuntimeExceptionWhenPrefixValueIsNot0x(){
+            try {
+                ssd.write("1", "0012345678");
+            } catch(RuntimeException e) {
+                assertThat(e).isInstanceOf(RuntimeException.class);
+            }
+        }
     }
 }
