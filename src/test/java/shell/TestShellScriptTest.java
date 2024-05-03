@@ -23,7 +23,7 @@ class TestShellScriptTest {
     }
 
     @Test
-    void fullwread() {
+    void fullread() {
     }
 
     @Test
