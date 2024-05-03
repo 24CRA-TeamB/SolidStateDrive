@@ -26,18 +26,23 @@ public class TestShellScript {
 
             String[] commands = input.split(" ");
 
-            switch (commands[0]) {
-                case READ:
-                    write();
-                    break;
-                case FULL_READ:
-                    fullRead();
-                    break;
-                case EXIT:
-                    exit();
-                    break;
-                default:
-                    System.out.println("Invalid commands.");
+            try {
+                switch (commands[0]) {
+                    case READ:
+                        write();
+                        break;
+                    case FULL_READ:
+                        fullRead();
+                        break;
+                    case EXIT:
+                        exit();
+                        break;
+                    default:
+                        System.out.println("Invalid commands.");
+                }
+            } catch (RuntimeException e) {
+                System.out.println("An error occurred while running the command");
+                System.out.println(e.getMessage());
             }
         }
     }
@@ -55,6 +60,7 @@ public class TestShellScript {
     @VisibleForTesting
     static void read(int input) {
         DeviceDriver deviceDriver = new DeviceDriver(new SamsungSSD());
+
         readFileAndPrint(deviceDriver, input);
     }
 
@@ -70,6 +76,8 @@ public class TestShellScript {
     private static void readFileAndPrint(DeviceDriver deviceDriver, int input) {
         deviceDriver.readData(input);
         // TODO: read result.txt and print output
+
+
     }
 
     @VisibleForTesting
