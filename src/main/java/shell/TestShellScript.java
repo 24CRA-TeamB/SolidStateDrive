@@ -33,7 +33,7 @@ public class TestShellScript {
             try {
                 switch (commands[0]) {
                     case READ:
-                        write();
+                        read(commands[1]);
                         break;
                     case FULL_READ:
                         fullRead();
@@ -64,22 +64,18 @@ public class TestShellScript {
     }
 
     @VisibleForTesting
-    static void read(int input) {
-        DeviceDriver deviceDriver = new DeviceDriver(new SamsungSSD());
-
-        readFileAndPrint(deviceDriver, input);
+    static void read(String lba) {
+        readFileAndPrint(deviceDriver, lba);
     }
 
     @VisibleForTesting
     static void fullRead() {
-        DeviceDriver deviceDriver = new DeviceDriver(new SamsungSSD());
-
-        for (int i = 0; i < 100; i++) {
-            readFileAndPrint(deviceDriver, i);
+        for (int i = 0; i < NUMBER_OF_LBA; i++) {
+            readFileAndPrint(deviceDriver, String.valueOf(i));
         }
     }
 
-    private static void readFileAndPrint(DeviceDriver deviceDriver, int input) {
+    private static void readFileAndPrint(DeviceDriver deviceDriver, String input) {
         deviceDriver.readData(input);
 
         DataReader.print(RESULT_FILE);
