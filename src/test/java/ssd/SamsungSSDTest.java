@@ -2,30 +2,43 @@ package ssd;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SamsungSSDTest {
 
-    private SSDInterface ssdInterface;
+    @Mock
+    SSDInterface ssdInterface;
+
+    DeviceDriver deviceDriver;
 
     @BeforeEach
     void setUp() {
-        this.ssdInterface = new SamsungSSD();
+        deviceDriver = new DeviceDriver(ssdInterface);
     }
 
     @Test
-    void readInvalidArgumentTest(){
-        assertThrows(InvalidLBAExcpetion.class, ()->{
-           ssdInterface.read("-1");
-        });
+    void readInvalidArgumentMinusLBATest(){
+        deviceDriver.readData("-1");
+        verify(ssdInterface, times(0)).read("-1");
+    }
 
-        assertThrows(InvalidLBAExcpetion.class, ()->{
-            ssdInterface.read("100");
-        });
+    @Test
+    void readInvalidArgumentOverMaxLBATest(){
+        deviceDriver.readData("100");
+        verify(ssdInterface, times(0)).read("100");
+    }
+
+    @Test
+    void readLBAData(){
+        deviceDriver.readData("3");
+        verify(ssdInterface, times(1)).read("3");
     }
 
     @Nested
@@ -50,7 +63,7 @@ class SamsungSSDTest {
 
 
             // when
-            ssd.write(3, 0x1298CDEF);
+            ssd.write("3", "0x1298CDEF");
 
             // then
         }
@@ -62,7 +75,7 @@ class SamsungSSDTest {
 
 
             // when
-            ssd.write(3, 0x1298CDEF);
+            ssd.write("3", "0x1298CDEF");
 
             // then
         }
