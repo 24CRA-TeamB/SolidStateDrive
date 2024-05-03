@@ -19,7 +19,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class TestShellScriptTest {
 
-    public static final int NUMBER_OF_LBA = 100;
     @Mock
     DeviceDriver mockDeviceDriver;
 
@@ -28,22 +27,18 @@ class TestShellScriptTest {
         TestShellScript.setDeviceDriver(mockDeviceDriver);
     }
 
-    @Test
-    void main() {
-    }
-
     @ParameterizedTest
     @MethodSource("getLBAandDataList")
-    void write_normally(String lba, String data) {
+    void writeNormally(String lba, String data) {
         TestShellScript.write(lba, data);
         verify(mockDeviceDriver, times(1)).writeData(lba, data);
     }
 
     @ParameterizedTest
     @MethodSource("getDataList")
-    void fullwrite_normally(String data) {
+    void fullwriteNormally(String data) {
         TestShellScript.fullwrite(data);
-        verify(mockDeviceDriver, times(NUMBER_OF_LBA)).writeData(anyString(), matches(data));
+        verify(mockDeviceDriver, times(TestShellScript.NUMBER_OF_LBA)).writeData(anyString(), matches(data));
     }
 
     @Test
