@@ -9,6 +9,7 @@ import java.util.Scanner;
 
 public class TestShellScript {
 
+    private static final String RESULT_FILE = "result.txt";
     private static final String READ = "read";
     private static final String FULL_READ = "fullread";
     private static final String EXIT = "exit";
@@ -75,9 +76,8 @@ public class TestShellScript {
 
     private static void readFileAndPrint(DeviceDriver deviceDriver, int input) {
         deviceDriver.readData(input);
-        // TODO: read result.txt and print output
 
-
+        DataReader.print(RESULT_FILE);
     }
 
     @VisibleForTesting
