@@ -12,7 +12,7 @@ public class TestShellScript {
 
         while (true) {
             String input = scanner.nextLine();
-            
+
         }
     }
 
@@ -32,7 +32,7 @@ public class TestShellScript {
     }
 
     @VisibleForTesting
-    static void fullwread() {
+    static void fullread() {
 
     }
 
