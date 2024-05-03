@@ -2,8 +2,6 @@ package shell;
 
 import org.assertj.core.util.VisibleForTesting;
 
-import java.ssd.DeviceDriver;
-import java.ssd.SamsungSSD;
 import java.util.Scanner;
 
 public class TestShellScript {
@@ -32,7 +30,7 @@ public class TestShellScript {
     }
 
     @VisibleForTesting
-    static void fullread() {
+    static void fullRead() {
 
     }
 
