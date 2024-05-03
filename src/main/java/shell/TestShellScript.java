@@ -8,6 +8,9 @@ import ssd.SamsungSSD;
 import java.util.Scanner;
 
 public class TestShellScript {
+    public static final int NUMBER_OF_LBA = 100;
+    private static DeviceDriver deviceDriver;
+
 
     private static final String RESULT_FILE = "result.txt";
     private static final String READ = "read";
@@ -49,13 +52,15 @@ public class TestShellScript {
     }
 
     @VisibleForTesting
-    static void write() {
-
+    static void write(String lba, String data) {
+        deviceDriver.writeData(lba, data);
     }
 
     @VisibleForTesting
-    static void fullwrite() {
-
+    static void fullwrite(String data) {
+        for (int i = 0; i < NUMBER_OF_LBA; i++) {
+            write(Integer.toString(i), data);
+        }
     }
 
     @VisibleForTesting
@@ -88,5 +93,9 @@ public class TestShellScript {
     @VisibleForTesting
     static void help() {
 
+    }
+
+    public static void setDeviceDriver(DeviceDriver device) {
+        deviceDriver = device;
     }
 }
