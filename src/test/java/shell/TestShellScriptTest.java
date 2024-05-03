@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ssd.DeviceDriver;
 import ssd.SSDInterface;
 
 import java.util.stream.Stream;
@@ -20,11 +21,11 @@ class TestShellScriptTest {
 
     public static final int NUMBER_OF_LBA = 100;
     @Mock
-    SSDInterface mockSSDInterface;
+    DeviceDriver mockDeviceDriver;
 
     @BeforeEach
     void setUp() {
-        TestShellScript.setSSDDriver(mockSSDInterface);
+        TestShellScript.setDeviceDriver(mockDeviceDriver);
     }
 
     @Test
@@ -35,14 +36,14 @@ class TestShellScriptTest {
     @MethodSource("getLBAandDataList")
     void write_normally(String lba, String data) {
         TestShellScript.write(lba, data);
-        verify(mockSSDInterface, times(1)).write(lba, data);
+        verify(mockDeviceDriver, times(1)).writeData(lba, data);
     }
 
     @ParameterizedTest
     @MethodSource("getDataList")
     void fullwrite_normally(String data) {
         TestShellScript.fullwrite(data);
-        verify(mockSSDInterface, times(NUMBER_OF_LBA)).write(anyString(), data);
+        verify(mockDeviceDriver, times(NUMBER_OF_LBA)).writeData(anyString(), matches(data));
     }
 
     @Test

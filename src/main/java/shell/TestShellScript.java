@@ -1,12 +1,13 @@
 package shell;
 
 import org.assertj.core.util.VisibleForTesting;
+import ssd.DeviceDriver;
 import ssd.SSDInterface;
 import java.util.Scanner;
 
 public class TestShellScript {
     public static final int NUMBER_OF_LBA = 100;
-    private static SSDInterface ssdInterface;
+    private static DeviceDriver deviceDriver;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -18,7 +19,7 @@ public class TestShellScript {
 
     @VisibleForTesting
     static void write(String lba, String data) {
-        ssdInterface.write(lba, data);
+        deviceDriver.writeData(lba, data);
     }
 
     @VisibleForTesting
@@ -48,7 +49,7 @@ public class TestShellScript {
 
     }
 
-    public static void setSSDDriver(SSDInterface ssdDriver) {
-        ssdInterface = ssdDriver;
+    public static void setDeviceDriver(DeviceDriver device) {
+        deviceDriver = device;
     }
 }
