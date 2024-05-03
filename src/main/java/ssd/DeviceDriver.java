@@ -1,3 +1,5 @@
+package java.ssd;
+
 public class DeviceDriver {
     private SSDInterface ssdInterface;
 

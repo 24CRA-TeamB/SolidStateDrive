@@ -1,3 +1,5 @@
+package java.ssd;
+
 public class SamsungSSD implements SSDInterface{
 
     @Override
