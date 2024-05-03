@@ -7,53 +7,55 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ssd.DeviceDriver;
-import ssd.SSDInterface;
 
 import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.matches;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class TestShellScriptTest {
+class TestShellTest {
+//    @Spy
+    TestShell testShell;
 
     @Mock
     DeviceDriver mockDeviceDriver;
 
     @BeforeEach
     void setUp() {
-        TestShellScript.setDeviceDriver(mockDeviceDriver);
+        testShell = new TestShell(mockDeviceDriver);
     }
 
     @ParameterizedTest
     @MethodSource("getLBAandDataList")
     void writeNormally(String lba, String data) {
-        TestShellScript.write(lba, data);
+        testShell.write(lba, data);
         verify(mockDeviceDriver, times(1)).writeData(lba, data);
     }
 
     @ParameterizedTest
     @MethodSource("getDataList")
     void fullwriteNormally(String data) {
-        TestShellScript.fullwrite(data);
-        verify(mockDeviceDriver, times(TestShellScript.NUMBER_OF_LBA)).writeData(anyString(), matches(data));
+        testShell.fullwrite(data);
+        verify(mockDeviceDriver, times(TestShell.NUMBER_OF_LBA)).writeData(anyString(), matches(data));
     }
 
     @Test
     void read() {
         String lba = "10";
-
-        TestShellScript.read(lba);
+        // doNothing().when(testShell).print(anyString());
+        testShell.read(lba);
 
         verify(mockDeviceDriver, times(1)).readData(lba);
     }
 
     @Test
     void fullRead() {
-        TestShellScript.fullRead();
+        testShell.fullRead();
 
         verify(mockDeviceDriver, times(100)).readData(anyString());
     }
