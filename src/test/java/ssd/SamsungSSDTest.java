@@ -1,13 +1,33 @@
 package ssd;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 class SamsungSSDTest {
+
+    private SSDInterface ssdInterface;
+
+    @BeforeEach
+    void setUp() {
+        this.ssdInterface = new SamsungSSD();
+    }
+
+    @Test
+    void readInvalidArgumentTest(){
+        assertThrows(InvalidLBAExcpetion.class, ()->{
+           ssdInterface.read("-1");
+        });
+
+        assertThrows(InvalidLBAExcpetion.class, ()->{
+            ssdInterface.read("100");
+        });
+    }
+
     @Nested
     class SamsungSSDWrite {
         SamsungSSD ssd;
