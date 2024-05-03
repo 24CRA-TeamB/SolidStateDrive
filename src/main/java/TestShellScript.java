@@ -1,4 +1,4 @@
-public class App {
+public class TestShellScript {
     public static void main(String[] args) {
         DeviceDriver deviceDriver = new DeviceDriver(new SamsungSSD());
         deviceDriver.writeData(10, 10);
