@@ -1,11 +1,9 @@
 package ssd;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class SamsungSSDTest {
     @Nested
@@ -24,27 +22,29 @@ class SamsungSSDTest {
         }
 
         @Test
-        @DisplayName("3번 LBA 영역에 값 0x1298CDEF를 저장한다")
+        @DisplayName("data 에 16진수 값이 넘는 값이 전달되면 RuntimeException 을 던진다")
         void writeThrowRuntimeExceptionWhenDataValueExceedInteger(){
-            // given
-
-
-            // when
-            ssd.write(3, 0x1298CDEF);
-
-            // then
+            try {
+                // when
+                ssd.write("3", "0x1298CDXF");
+                fail();
+            } catch(RuntimeException e) {
+                // then
+                assertThat(e).isInstanceOf(RuntimeException.class);
+            }
         }
 
         @Test
-        @DisplayName("3번 LBA 영역에 값 0x1298CDEF를 저장한다")
-        void writeLogicBlockAddress(){
-            // given
-
-
-            // when
-            ssd.write(3, 0x1298CDEF);
-
-            // then
+        @DisplayName("lba 에 0보다 작은 값이 전달되는 경우 RuntimeException 을 던진다")
+        void writeThrowRuntimeExceptionWhenLbaValueExceedInteger(){
+            try {
+                // when
+                ssd.write("-1", "0x12345678");
+                fail();
+            } catch(RuntimeException e) {
+                // then
+                assertThat(e).isInstanceOf(RuntimeException.class);
+            }
         }
     }
 }
