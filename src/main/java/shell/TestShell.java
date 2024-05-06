@@ -25,6 +25,10 @@ public class TestShell {
         this.deviceDriver = deviceDriver;
     }
 
+    public DeviceDriver getDeviceDriver() {
+        return this.deviceDriver;
+    }
+
     public void write(String lba, String data) {
         deviceDriver.writeData(lba, data);
     }
