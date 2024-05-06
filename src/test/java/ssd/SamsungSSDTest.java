@@ -6,6 +6,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.File;
+
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,6 +15,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SamsungSSDTest {
+    public static final String READ_DATA_TARGET_FILE = "src/main/resources/nand.txt";
 
     @Mock
     SSDInterface ssdInterface;
@@ -85,5 +88,22 @@ class SamsungSSDTest {
         } catch(RuntimeException e) {
             assertThat(e).isInstanceOf(RuntimeException.class);
         }
+    }
+
+    @Test
+    @DisplayName("write가 동작했을 때 nand.txt 파일이 없다면 생성한다")
+    void givenNandTxtDoesNotExist_whenWrite_thenCreateNandTxtFile(){
+        // given
+        File file = new File(READ_DATA_TARGET_FILE);
+        if(file.exists()){
+            file.delete();
+        }
+
+        // when
+        ssd.write("1", "0x12345678");
+
+        // then
+        File nandTxt = new File(READ_DATA_TARGET_FILE);
+        assertThat(nandTxt.exists()).isTrue();
     }
 }

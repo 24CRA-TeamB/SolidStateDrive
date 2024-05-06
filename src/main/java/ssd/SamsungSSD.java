@@ -53,6 +53,17 @@ public class SamsungSSD implements SSDInterface{
 
         if(Integer.parseInt(lba) < 0)
             throw new RuntimeException();
+
+        File nandTxt = new File(READ_DATA_TARGET_FILE);
+        if(nandTxt.exists()){
+
+        } else {
+            try {
+                nandTxt.createNewFile();
+            } catch (IOException e) {
+                System.out.println("파일을 생성하는 도중 오류가 발생했습니다.");
+            }
+        }
     }
 
     private boolean isValidData(String data) {
