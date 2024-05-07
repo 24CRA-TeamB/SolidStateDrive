@@ -1,12 +1,14 @@
 package ssd;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.File;
+import java.io.*;
 
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -96,7 +98,8 @@ class SamsungSSDTest {
         // given
         File file = new File(READ_DATA_TARGET_FILE);
         if(file.exists()){
-            file.delete();
+            boolean deleteSuccess = file.delete();
+            if(!deleteSuccess) fail("정상적으로 파일을 삭제하지 못 했습니다.");
         }
 
         // when
@@ -105,5 +108,40 @@ class SamsungSSDTest {
         // then
         File nandTxt = new File(READ_DATA_TARGET_FILE);
         assertThat(nandTxt.exists()).isTrue();
+    }
+
+    @Test
+    @DisplayName("lba 가 1, data 가 0x12345678 이 주어졌을 때, 1번 Json 객체의 데이터 값이 0x12345678")
+    void givenSamsungSSD_whenWriteLba1_and_Data0x123456778_thenNandTxtContainResult(){
+        try {
+            // given
+            createSampleNandTxt();
+
+            // when
+            ssd.write("1", "0x12345678");
+
+            // then
+            FileReader fileReader = new FileReader(READ_DATA_TARGET_FILE);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String jsonString = bufferedReader.readLine();
+
+            JSONArray jsonArray = new JSONArray(jsonString);
+            JSONObject jsonObject = (JSONObject) jsonArray.get(1);
+            assertThat(jsonObject.get("data")).isEqualTo("0x12345678");
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void createSampleNandTxt(){
+        try {
+            FileWriter writer = new FileWriter(READ_DATA_TARGET_FILE);
+            writer.write("[{\"data\":\"0x00000000\",\"lba\":\"0\"}, {\"data\":\"0x00000000\",\"lba\":\"1\"}]");
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
