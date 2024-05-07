@@ -16,6 +16,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class SamsungSSDTest {
     public static final String READ_DATA_TARGET_FILE = "src/main/resources/nand.txt";
+    public static final String SAMPLE_DATA_JSON_STRING = "[{\"data\":\"0x00000000\",\"lba\":\"0\"}, {\"data\":\"0x00000000\",\"lba\":\"1\"}]";
 
     @Mock
     SSDInterface ssdInterfaceMock;
@@ -144,7 +145,7 @@ class SamsungSSDTest {
     private void createSampleNandTxt(){
         try {
             FileWriter writer = new FileWriter(READ_DATA_TARGET_FILE);
-            writer.write("[{\"data\":\"0x00000000\",\"lba\":\"0\"}, {\"data\":\"0x00000000\",\"lba\":\"1\"}]");
+            writer.write(SAMPLE_DATA_JSON_STRING);
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();

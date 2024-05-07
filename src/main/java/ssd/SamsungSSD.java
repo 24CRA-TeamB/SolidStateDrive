@@ -43,14 +43,18 @@ public class SamsungSSD implements SSDInterface{
             JSONObject jsonObject = jsonArray.getJSONObject(Integer.parseInt(lba));
             jsonObject.put("data", data);
 
-            FileWriter fileWriter = new FileWriter(NAND_TXT_PATH);
-            fileWriter.write(jsonArray.toString());
-            fileWriter.close();
+            writeJsonArrayToNandTxtPath(jsonArray);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static void writeJsonArrayToNandTxtPath(JSONArray jsonArray) throws IOException {
+        FileWriter fileWriter = new FileWriter(NAND_TXT_PATH);
+        fileWriter.write(jsonArray.toString());
+        fileWriter.close();
     }
 
     private void writeResultFile(String readValue) {
@@ -132,9 +136,7 @@ public class SamsungSSD implements SSDInterface{
                     jsonObject.put("data", EMPTY_DATA_VALUE);
                     jsonArray.put(jsonObject);
                 }
-                FileWriter fileWriter = new FileWriter(NAND_TXT_PATH);
-                fileWriter.write(jsonArray.toString());
-                fileWriter.close();
+                writeJsonArrayToNandTxtPath(jsonArray);
             }
         } catch (IOException e) {
             System.out.println("파일을 생성하는 도중 오류가 발생했습니다.");
