@@ -16,7 +16,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class SSDTest {
 
-    public static final String NAND_TXT_PATH = "..\\nand.txt";
+    public static final String NAND_TXT_PATH = "./nand.txt";
     public static final int WRITE_ARGUMENT_NUM = 3;
     public static final int READ_ARGUMENT_NUM = 2;
     public static final int MAX_LBA = 99;
@@ -32,7 +32,6 @@ class SSDTest {
     @BeforeEach
     void setUp() {
         ssd = new SSD(ssdInterface);
-        ssd.createNandFile();
     }
 
     @Test
