@@ -1,5 +1,9 @@
 package shell;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class SSDExecutor {
     private final String jar;
 
@@ -8,16 +12,19 @@ public class SSDExecutor {
     }
 
     public void writeData(String lba, String data) {
-        runCommand("ssd", "W", lba, data);
+        runCommand("W", lba, data);
     }
 
     public void readData(String lba) {
-        runCommand("ssd", "R", lba);
+        runCommand("R", lba);
     }
 
     private void runCommand(String... args) {
-        ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar", jar);
-        processBuilder.command(args);
+        List<String> commands = new ArrayList<>(Arrays.asList("java", "-jar", jar));
+        commands.addAll(Arrays.asList(args));
+
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        processBuilder.command(commands);
 
         try {
             Process process = processBuilder.start();

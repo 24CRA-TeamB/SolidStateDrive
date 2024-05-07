@@ -19,10 +19,14 @@ public class TestShellScript {
     private static final int NUMBER_OF_ARGUMENTS_FOR_HELP = 0;
     private static final int NUMBER_OF_ARGUMENTS_FOR_EXIT = 0;
 
-    private static final String SSD_JAR = "ssd.jar";
-
     public static void main(String[] args) {
-        TestShell testShell = new TestShell(new SSDExecutor(SSD_JAR));
+        if (Strings.isNullOrEmpty(args[0])) {
+            System.out.println("ssd.jar is required.");
+            System.exit(0);
+        }
+
+        String ssdJar = args[0];
+        TestShell testShell = new TestShell(new SSDExecutor(ssdJar));
 
         while (true) {
             String[] userInputArray = getUserInput();
