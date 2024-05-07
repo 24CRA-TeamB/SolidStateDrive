@@ -10,9 +10,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ssd.DeviceDriver;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -38,19 +36,23 @@ class TestShellTest {
             + "help\t\tprint description of TestShell. ex) help\r\n"
             + "exit\t\tend TestShell. ex) exit\r\n";
     private static final String NOT_EXISTED_FILE = "not_existed_file.txt";
-
-    @Spy
-    TestShell spyTestShell;
+    private static final String SSD_JAR = "ssd.jar";
 
     @Mock
-    DeviceDriver mockDeviceDriver;
+    SSDExecutor mockSSDExecutor;
+
+    TestShell testShell;
 
     private PrintStream originalOut;
     private ByteArrayOutputStream outputStream;
 
+    TestShellTest() {
+        mockSSDExecutor = new SSDExecutor(SSD_JAR);
+    }
+
     @BeforeEach
     void setUp() {
-        spyTestShell.setDeviceDriver(mockDeviceDriver);
+        testShell = new TestShell(mockSSDExecutor);
 
         outputStream = new ByteArrayOutputStream();
         originalOut = System.out;
@@ -62,44 +64,43 @@ class TestShellTest {
         System.setOut(originalOut);
     }
 
-    @Test
-    void constructWithDeviceDriver() {
-        TestShell testShell = new TestShell(mockDeviceDriver);
-
-        assertEquals(mockDeviceDriver, testShell.getDeviceDriver());
-    }
-
     @ParameterizedTest
     @MethodSource("getLBAandDataList")
     void writeNormally(String lba, String data) {
-        spyTestShell.write(lba, data);
-        verify(mockDeviceDriver, times(1)).writeData(lba, data);
+        doNothing().when(mockSSDExecutor).writeData(lba, data);
+
+        testShell.write(lba, data);
+
+        verify(mockSSDExecutor, times(1)).writeData(lba, data);
     }
 
     @ParameterizedTest
     @MethodSource("getDataList")
     void fullwriteNormally(String data) {
-        spyTestShell.fullwrite(data);
-        verify(mockDeviceDriver, times(TestShell.NUMBER_OF_LBA)).writeData(anyString(), matches(data));
+        doNothing().when(mockSSDExecutor).writeData(anyString(), matches(data));
+
+        testShell.fullwrite(data);
+
+        verify(mockSSDExecutor, times(TestShell.NUMBER_OF_LBA)).writeData(anyString(), matches(data));
     }
 
     @Test
     void read() {
         String lba = "10";
-        doNothing().when(spyTestShell).print(anyString());
+        doNothing().when(mockSSDExecutor).readData(lba);
 
-        spyTestShell.read(lba);
+        testShell.read(lba);
 
-        verify(mockDeviceDriver, times(1)).readData(lba);
+        verify(mockSSDExecutor, times(1)).readData(lba);
     }
 
     @Test
     void fullRead() {
-        doNothing().when(spyTestShell).print(anyString());
+        doNothing().when(mockSSDExecutor).readData(anyString());
 
-        spyTestShell.fullRead();
+        testShell.fullRead();
 
-        verify(mockDeviceDriver, times(100)).readData(anyString());
+        verify(mockSSDExecutor, times(100)).readData(anyString());
     }
 
     @ParameterizedTest
@@ -110,7 +111,7 @@ class TestShellTest {
 
         Files.write(filePath, input.getBytes());
 
-        spyTestShell.print(filePath.toString());
+        testShell.print(filePath.toString());
 
         String actual = outputStream.toString().trim();
         assertThat(actual).isEqualTo(input);
@@ -118,7 +119,7 @@ class TestShellTest {
 
     @Test
     void printFail() {
-        spyTestShell.print(NOT_EXISTED_FILE);
+        testShell.print(NOT_EXISTED_FILE);
 
         String actual = outputStream.toString().trim();
         String expected = "Failed to read result. " + NOT_EXISTED_FILE;
@@ -132,10 +133,9 @@ class TestShellTest {
 
     @Test
     void help() {
-        spyTestShell.help();
+        testShell.help();
 
         assertEquals(HELP_DESCRIPTION, outputStream.toString());
-
     }
 
     static Stream<Arguments> getLBAandDataList() {

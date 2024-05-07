@@ -2,9 +2,6 @@ package shell;
 
 import org.assertj.core.util.Strings;
 import org.assertj.core.util.VisibleForTesting;
-import ssd.DeviceDriver;
-import ssd.SamsungSSD;
-
 import java.util.Scanner;
 
 public class TestShellScript {
@@ -22,8 +19,10 @@ public class TestShellScript {
     private static final int NUMBER_OF_ARGUMENTS_FOR_HELP = 0;
     private static final int NUMBER_OF_ARGUMENTS_FOR_EXIT = 0;
 
+    private static final String SSD_JAR = "ssd.jar";
+
     public static void main(String[] args) {
-        TestShell testShell = new TestShell(new DeviceDriver(new SamsungSSD()));
+        TestShell testShell = new TestShell(new SSDExecutor(SSD_JAR));
 
         while (true) {
             String[] userInputArray = getUserInput();

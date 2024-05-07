@@ -1,7 +1,6 @@
 package shell;
 
 import org.assertj.core.util.VisibleForTesting;
-import ssd.DeviceDriver;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,25 +12,15 @@ public class TestShell {
     // LBA 갯수는 DeviceDriver에서 가져오도록 고민
     public static final int NUMBER_OF_LBA = 100;
     static final String RESULT_FILE = "result.txt";
-    private DeviceDriver deviceDriver;
 
-    public TestShell() {
-    }
+    private SSDExecutor ssdExecutor;
 
-    public TestShell(DeviceDriver deviceDriver) {
-        setDeviceDriver(deviceDriver);
-    }
-
-    public void setDeviceDriver(DeviceDriver deviceDriver) {
-        this.deviceDriver = deviceDriver;
-    }
-
-    public DeviceDriver getDeviceDriver() {
-        return this.deviceDriver;
+    public TestShell(SSDExecutor ssdExecutor) {
+        this.ssdExecutor = ssdExecutor;
     }
 
     public void write(String lba, String data) {
-        deviceDriver.writeData(lba, data);
+        ssdExecutor.writeData(lba, data);
     }
 
     public void fullwrite(String data) {
@@ -41,17 +30,17 @@ public class TestShell {
     }
 
     public void read(String lba) {
-        readFileAndPrint(deviceDriver, lba);
+        readFileAndPrint(lba);
     }
 
     public void fullRead() {
         for (int i = 0; i < NUMBER_OF_LBA; i++) {
-            readFileAndPrint(deviceDriver, String.valueOf(i));
+            readFileAndPrint(String.valueOf(i));
         }
     }
 
-    private void readFileAndPrint(DeviceDriver deviceDriver, String input) {
-        deviceDriver.readData(input);
+    private void readFileAndPrint(String input) {
+        ssdExecutor.readData(input);
 
         print(RESULT_FILE);
     }
