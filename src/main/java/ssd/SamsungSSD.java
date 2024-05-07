@@ -8,8 +8,8 @@ import java.io.*;
 public class SamsungSSD implements SSDInterface{
 
     public static final String EMPTY_DATA_VALUE = "0x00000000";
-    public static final String NAND_TXT_PATH = "src/main/resources/nand.txt";
-    public static final String RESULT_TXT_PATH = "src/main/resources/result.txt";
+    public static final String NAND_TXT_PATH = "..\\nand.txt";
+    public static final String RESULT_TXT_PATH = "..\\result.txt";
 
     @Override
     public void read(String lba) {
