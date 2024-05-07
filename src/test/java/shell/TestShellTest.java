@@ -11,7 +11,9 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ssd.DeviceDriver;
 
+import java.io.ByteArrayOutputStream;
 import java.util.stream.Stream;
+import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -20,6 +22,13 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TestShellTest {
+    public static final String HELP_DESCRIPTION = "Usage of TestShell\r\n"
+            + "write\t\twrite data at a LBA. ex) write [LBA] [Data]\r\n"
+            + "fullwrite\twrite data at all of LBA. ex) write [Data]\r\n"
+            + "read\t\tread data from a LBA. ex) read [LBA]\r\n"
+            + "fullread\tread data from all of LBA. ex) fullread\r\n"
+            + "help\t\tprint description of TestShell. ex) help\r\n"
+            + "exit\t\tend TestShell. ex) exit\r\n";
     @Spy
     TestShell spyTestShell;
 
@@ -74,6 +83,14 @@ class TestShellTest {
 
     @Test
     void help() {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(outputStream));
+
+        spyTestShell.help();
+
+        assertEquals(HELP_DESCRIPTION, outputStream.toString());
+        System.setOut(originalOut);
     }
 
     static Stream<Arguments> getLBAandDataList() {
