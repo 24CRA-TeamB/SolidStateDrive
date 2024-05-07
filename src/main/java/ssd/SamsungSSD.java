@@ -7,13 +7,14 @@ import java.io.*;
 
 public class SamsungSSD implements SSDInterface{
 
-    public static final String READ_DATA_TARGET_FILE = "src/main/resources/nand.txt";
     public static final String EMPTY_DATA_VALUE = "0x00000000";
+    public static final String NAND_TXT_PATH = "src/main/resources/nand.txt";
+    public static final String RESULT_TXT_PATH = "src/main/resources/result.txt";
 
     @Override
     public void read(String lba) {
-        //File Read
-        readNandFileForTargetLBA(lba);
+        String readValue = readNandFileForTargetLBA(lba);
+        writeResultFile(readValue);
     }
 
     @Override
@@ -29,7 +30,7 @@ public class SamsungSSD implements SSDInterface{
         }
 
         try {
-            FileReader fileReader = new FileReader(READ_DATA_TARGET_FILE);
+            FileReader fileReader = new FileReader(NAND_TXT_PATH);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
 
             StringBuilder stringBuilder = new StringBuilder();
@@ -42,7 +43,7 @@ public class SamsungSSD implements SSDInterface{
             JSONObject jsonObject = jsonArray.getJSONObject(Integer.parseInt(lba));
             jsonObject.put("data", data);
 
-            FileWriter fileWriter = new FileWriter(READ_DATA_TARGET_FILE);
+            FileWriter fileWriter = new FileWriter(NAND_TXT_PATH);
             fileWriter.write(jsonArray.toString());
             fileWriter.close();
         } catch (FileNotFoundException e) {
@@ -52,42 +53,76 @@ public class SamsungSSD implements SSDInterface{
         }
     }
 
-    public String readNandFileForTargetLBA(String lba) {
+    private void writeResultFile(String readValue) {
         try {
-            FileReader fileReader = new FileReader(READ_DATA_TARGET_FILE);
-
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                JSONObject readData = new JSONObject(line);
-                if(isTargetLBA(lba, readData)){
-                    return getTargetLBAData(readData);
-                }
-            }
-
-            bufferedReader.close();
+            FileWriter writer = new FileWriter(RESULT_TXT_PATH);
+            writer.write(readValue);
+            writer.close();
         } catch (IOException e) {
-            System.out.println("파일을 읽는 도중 오류가 발생했습니다: " + e.getMessage());
+            System.out.println("파일 쓰기 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    private String readNandFileForTargetLBA(String lba) {
+        if(isNandTxtNotExist()) return EMPTY_DATA_VALUE;
+
+        String nandTextString = getNandTextString();
+
+        if(isNandTextEmpty(nandTextString)) return EMPTY_DATA_VALUE;
+
+        return findAndGetTargetLbaData(lba, nandTextString);
+    }
+
+    private static boolean isNandTextEmpty(String nandTextString) {
+        return nandTextString == null;
+    }
+
+    private String findAndGetTargetLbaData(String lba, String nandTextString) {
+        JSONArray jsonArray = new JSONArray(nandTextString);
+        for(int jsonIdx=0; jsonIdx<jsonArray.length(); jsonIdx++){
+            if(isTargetLBA(lba, jsonArray.getJSONObject(jsonIdx))){
+                return getTargetLbaData(jsonArray.getJSONObject(jsonIdx));
+            }
         }
         return EMPTY_DATA_VALUE;
     }
 
-    private static String getTargetLBAData(JSONObject readData) {
+    private String getNandTextString() {
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(NAND_TXT_PATH));
+
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(bufferedReader.readLine());
+
+            bufferedReader.close();
+
+            return stringBuilder.toString();
+        } catch (IOException e) {
+            System.out.println("파일을 읽는 도중 오류가 발생했습니다: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    private boolean isNandTxtNotExist() {
+        return !(new File(NAND_TXT_PATH).exists());
+    }
+
+    private String getTargetLbaData(JSONObject readData) {
         return readData.get("data").toString();
     }
 
-    private static boolean isTargetLBA(String lba, JSONObject readData) {
+    private boolean isTargetLBA(String lba, JSONObject readData) {
         return readData.get("lba").equals(lba);
     }
 
     private boolean doesNandFileExist() {
-        File nandTxt = new File(READ_DATA_TARGET_FILE);
+        File nandTxt = new File(NAND_TXT_PATH);
         return nandTxt.exists();
     }
 
     private void createNandFile() {
-        File nandTxtFile = new File(READ_DATA_TARGET_FILE);
+        File nandTxtFile = new File(NAND_TXT_PATH);
         try {
             if(nandTxtFile.createNewFile()){
                 JSONArray jsonArray = new JSONArray();
@@ -97,7 +132,7 @@ public class SamsungSSD implements SSDInterface{
                     jsonObject.put("data", EMPTY_DATA_VALUE);
                     jsonArray.put(jsonObject);
                 }
-                FileWriter fileWriter = new FileWriter(READ_DATA_TARGET_FILE);
+                FileWriter fileWriter = new FileWriter(NAND_TXT_PATH);
                 fileWriter.write(jsonArray.toString());
                 fileWriter.close();
             }

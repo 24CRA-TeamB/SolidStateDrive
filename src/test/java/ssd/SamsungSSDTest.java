@@ -5,14 +5,12 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.*;
 
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -20,7 +18,9 @@ class SamsungSSDTest {
     public static final String READ_DATA_TARGET_FILE = "src/main/resources/nand.txt";
 
     @Mock
-    SSDInterface ssdInterface;
+    SSDInterface ssdInterfaceMock;
+
+    DeviceDriver deviceDriverMock;
 
     DeviceDriver deviceDriver;
 
@@ -28,26 +28,32 @@ class SamsungSSDTest {
 
     @BeforeEach
     void setUp() {
-        deviceDriver = new DeviceDriver(ssdInterface);
         ssd = new SamsungSSD();
+        deviceDriverMock = new DeviceDriver(ssdInterfaceMock);
+        deviceDriver = new DeviceDriver(new SamsungSSD());
     }
 
     @Test
     void readInvalidArgumentMinusLBATest(){
-        deviceDriver.readData("-1");
-        verify(ssdInterface, times(0)).read("-1");
+        deviceDriverMock.readData("-1");
+        verify(ssdInterfaceMock, times(0)).read("-1");
     }
 
     @Test
     void readInvalidArgumentOverMaxLBATest(){
-        deviceDriver.readData("100");
-        verify(ssdInterface, times(0)).read("100");
+        deviceDriverMock.readData("100");
+        verify(ssdInterfaceMock, times(0)).read("100");
     }
 
     @Test
-    void readLBAData(){
-        deviceDriver.readData("3");
-        verify(ssdInterface, times(1)).read("3");
+    void readInterfaceLbaData(){
+        deviceDriverMock.readData("14");
+        verify(ssdInterfaceMock, times(1)).read("14");
+    }
+
+    @Test
+    void readLbaData(){
+        deviceDriver.readData("4");
     }
 
     @Test
