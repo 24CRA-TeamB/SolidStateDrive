@@ -32,7 +32,6 @@ class SSDTest {
     @BeforeEach
     void setUp() {
         ssd = new SSD(ssdInterface);
-        ssd.createNandFile();
     }
 
     @Test
