@@ -62,7 +62,6 @@ public class SSD {
         if(cmdArgs[0].equals("R"))
             return false;
 
-
         if(!cmdArgs[2].startsWith("0x"))
             return true;
 
@@ -113,6 +112,7 @@ public class SSD {
             System.out.println("파일을 생성하는 도중 오류가 발생했습니다.");
         }
     }
+
     public static void writeJsonArrayToNandTxtPath(JSONArray jsonArray) throws IOException {
         FileWriter fileWriter = new FileWriter(NAND_TXT_PATH);
         fileWriter.write(jsonArray.toString());

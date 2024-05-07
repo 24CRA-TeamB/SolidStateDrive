@@ -1,6 +1,7 @@
 package ssd;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -35,6 +36,7 @@ class SSDTest {
     }
 
     @Test
+    @DisplayName("doCommand 명령어를 수행했을 때 read 명령어가 반드시 1회 수행된다 ")
     void doCommand() {
         setValidReadCommand();
         ssd.doCommand(readCommand);
@@ -42,9 +44,51 @@ class SSDTest {
     }
 
     @Test
+    @DisplayName("lba 에 유효하지 않은 데이터 X가 전달될 때 유효성을 검증한다")
     void isImpossibleToParseToInt() {
         setInvalidWriteCommand();
         assertEquals(true, ssd.isImpossibleToParseToInt(writeCommand[1]));
+    }
+
+    @Test
+    @DisplayName("Logic Block Address 값의 최소값과 최대값을 검증한다")
+    void isInvalidLBA() {
+        assertEquals(true, ssd.isInvalidLBA(MIN_LBA-1));
+        assertEquals(true, ssd.isInvalidLBA(MAX_LBA+1));
+    }
+
+    @Test
+    @DisplayName("File이 존재하지 않을 때, false 값을 반환한다")
+    void doesNandFileExist() {
+        assertEquals(false, new File(NAND_TXT_PATH).exists());
+    }
+
+    @Test
+    @DisplayName("jar 파일로 W 명령어가 전달되었을 때, 드라이버 write 명령어가 1회 수행된다")
+    void givenWriteCommand_whenWriteCommand_thenVerifyCallOnce(){
+        // given
+        setValidWriteCommand();
+
+        // when
+        ssd.doCommand(writeCommand);
+
+        // then
+        verify(ssdInterface, times(1)).write("1", "0x12345678");
+    }
+
+    @Test
+    @DisplayName("lba 값으로 01이 전달될 때 false를 반환한다")
+    void isImpossibleToParseToIntWith01(){
+        // given
+        set01ToLbaInReadCommand();
+        Integer value = Integer.parseInt(readCommand[1]);
+        System.out.println(value);
+
+        // when
+        boolean success = ssd.isImpossibleToParseToInt(readCommand[1]);
+
+        // then
+        assertFalse(success);
     }
 
     private void setValidReadCommand() {
@@ -64,14 +108,7 @@ class SSDTest {
         writeCommand[2] = "0x12345678";
     }
 
-    @Test
-    void isInvalidLBA() {
-        assertEquals(true, ssd.isInvalidLBA(MIN_LBA-1));
-        assertEquals(true, ssd.isInvalidLBA(MAX_LBA+1));
-    }
-
-    @Test
-    void doesNandFileExist() {
-        assertEquals(false, new File(NAND_TXT_PATH).exists());
+    private void set01ToLbaInReadCommand(){
+        readCommand[1] = "01";
     }
 }
