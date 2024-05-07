@@ -38,15 +38,26 @@ class SSDTest {
     @Test
     @DisplayName("doCommand 명령어를 수행했을 때 read 명령어가 반드시 1회 수행된다 ")
     void doCommand() {
-        setValidReadCommand();
+        // given
+        setReadCommand("R", "1");
+
+        // when
         ssd.doCommand(readCommand);
+
+        // then
         verify(ssdInterface, times(1)).read("1");
     }
 
     @Test
     @DisplayName("lba 에 유효하지 않은 데이터 X가 전달될 때 유효성을 검증한다")
     void isImpossibleToParseToInt() {
-        setInvalidWriteCommand();
+        // given
+
+
+        // when
+        setWriteCommand("W", "1", "0x12345678");
+
+        // then
         assertEquals(true, ssd.isImpossibleToParseToInt(writeCommand[1]));
     }
 
@@ -67,7 +78,7 @@ class SSDTest {
     @DisplayName("jar 파일로 W 명령어가 전달되었을 때, 드라이버 write 명령어가 1회 수행된다")
     void givenWriteCommand_whenWriteCommand_thenVerifyCallOnce(){
         // given
-        setValidWriteCommand();
+        setWriteCommand("W", "1", "0x12345678");
 
         // when
         ssd.doCommand(writeCommand);
@@ -80,9 +91,7 @@ class SSDTest {
     @DisplayName("lba 값으로 01이 전달될 때 false를 반환한다")
     void isImpossibleToParseToIntWith01(){
         // given
-        set01ToLbaInReadCommand();
-        Integer value = Integer.parseInt(readCommand[1]);
-        System.out.println(value);
+        setReadCommand("R", "01");
 
         // when
         boolean success = ssd.isImpossibleToParseToInt(readCommand[1]);
@@ -91,24 +100,14 @@ class SSDTest {
         assertFalse(success);
     }
 
-    private void setValidReadCommand() {
-        readCommand[0] = "R";
-        readCommand[1] = "1";
+    private void setWriteCommand(String writeCode, String lba, String data){
+        writeCommand[0] = writeCode;
+        writeCommand[1] = lba;
+        writeCommand[2] = data;
     }
 
-    private void setInvalidWriteCommand() {
-        writeCommand[0] = "W";
-        writeCommand[1] = "X";
-        writeCommand[2] = "0x12345678";
-    }
-
-    private void setValidWriteCommand() {
-        writeCommand[0] = "W";
-        writeCommand[1] = "1";
-        writeCommand[2] = "0x12345678";
-    }
-
-    private void set01ToLbaInReadCommand(){
-        readCommand[1] = "01";
+    private void setReadCommand(String writeCode, String lba){
+        readCommand[1] = writeCode;
+        readCommand[2] = lba;
     }
 }
