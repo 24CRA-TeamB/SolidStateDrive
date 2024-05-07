@@ -79,17 +79,17 @@ public class TestShellScript {
     @VisibleForTesting
     static String getCommandFromUserInput(String[] userInputArray) {
         String command = "";
-        if (userInputArray.length >= NUMBER_OF_ARGUMENTS_FOR_READ) {
-            command = userInputArray[NUMBER_OF_ARGUMENTS_FOR_FULLREAD];
+        if (userInputArray.length >= 1) {
+            command = userInputArray[0];
         }
         return command;
     }
 
     @VisibleForTesting
     static String[] getArgumentsFromUserInput(String[] userInputArray) {
-        String[] arguments = new String[userInputArray.length - NUMBER_OF_ARGUMENTS_FOR_READ];
-        for (int i = NUMBER_OF_ARGUMENTS_FOR_FULLREAD; i < arguments.length; i++) {
-            arguments[i] = userInputArray[i + NUMBER_OF_ARGUMENTS_FOR_READ];
+        String[] arguments = new String[userInputArray.length - 1];
+        for (int i = 0; i < arguments.length; i++) {
+            arguments[i] = userInputArray[i + 1];
         }
         return arguments;
     }
@@ -107,5 +107,4 @@ public class TestShellScript {
 
         return input.split(" ");
     }
-
 }
