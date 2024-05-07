@@ -12,6 +12,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.OngoingStubbing;
+import org.mockito.stubbing.Stubber;
 import ssd.DeviceDriver;
 
 import java.io.ByteArrayOutputStream;
@@ -50,6 +52,7 @@ class TestShellTest {
 
     @BeforeEach
     void setUp() {
+        lenient().doNothing().when(mockDeviceDriver).writeData(anyString(), anyString());
         spyTestShell.setDeviceDriver(mockDeviceDriver);
 
         outputStream = new ByteArrayOutputStream();
@@ -72,32 +75,31 @@ class TestShellTest {
     @ParameterizedTest
     @MethodSource("getLBAandDataList")
     void writeNormally(String lba, String data) {
-        spyTestShell.write(lba, data);
+        spyTestShell.write(new String[] {lba, data});
         verify(mockDeviceDriver, times(1)).writeData(lba, data);
     }
 
     @ParameterizedTest
     @MethodSource("getDataList")
     void fullwriteNormally(String data) {
-        spyTestShell.fullwrite(data);
+        spyTestShell.fullwrite(new String[]{data});
         verify(mockDeviceDriver, times(TestShell.NUMBER_OF_LBA)).writeData(anyString(), matches(data));
     }
 
     @Test
     void read() {
-        String lba = "10";
-        doNothing().when(spyTestShell).print(anyString());
+        String[] arguments = new String[] {"10"};
 
-        spyTestShell.read(lba);
+        spyTestShell.read(arguments);
 
-        verify(mockDeviceDriver, times(1)).readData(lba);
+        verify(mockDeviceDriver, times(1)).readData(arguments[0]);
     }
 
     @Test
     void fullRead() {
-        doNothing().when(spyTestShell).print(anyString());
+        String[] arguments = new String[] {};
 
-        spyTestShell.fullRead();
+        spyTestShell.fullread(arguments);
 
         verify(mockDeviceDriver, times(100)).readData(anyString());
     }
@@ -110,15 +112,13 @@ class TestShellTest {
 
         Files.write(filePath, input.getBytes());
 
-        spyTestShell.print(filePath.toString());
-
-        String actual = outputStream.toString().trim();
+        String actual = spyTestShell.readResult(filePath.toString());
         assertThat(actual).isEqualTo(input);
     }
 
     @Test
     void printFail() {
-        spyTestShell.print(NOT_EXISTED_FILE);
+        spyTestShell.readResult(NOT_EXISTED_FILE);
 
         String actual = outputStream.toString().trim();
         String expected = "Failed to read result. " + NOT_EXISTED_FILE;
@@ -132,10 +132,11 @@ class TestShellTest {
 
     @Test
     void help() {
-        spyTestShell.help();
+        String[] arguments = new String[]{};
+
+        spyTestShell.help(arguments);
 
         assertEquals(HELP_DESCRIPTION, outputStream.toString());
-
     }
 
     static Stream<Arguments> getLBAandDataList() {
@@ -152,5 +153,63 @@ class TestShellTest {
                 Arguments.arguments("0xAAAABBBB"),
                 Arguments.arguments("0xFFFFFFFF")
         );
+    }
+
+    @Test
+    void testapp1() {
+        doNothing().when(spyTestShell).fullwrite(any());
+        stubReadResult("0x12345678", 0, 100);
+
+        spyTestShell.testapp1();
+
+        verify(spyTestShell, times(1)).fullwrite(any());
+        verify(spyTestShell, times(1)).fullread(any());
+
+        assertEquals("TestApp1 success\r\n", outputStream.toString());
+    }
+
+    @Test
+    void testapp1_fail() {
+        doNothing().when(spyTestShell).fullwrite(any());
+        stubReadResult("0x87654321", 0, 100);
+
+        spyTestShell.testapp1();
+
+        verify(spyTestShell, times(1)).fullwrite(any());
+        verify(spyTestShell, times(1)).fullread(any());
+
+        assertEquals("TestApp1 fail\r\n", outputStream.toString());
+    }
+
+    @Test
+    void testapp2() {
+        stubReadResult("0x12345678", 0, 5);
+
+        spyTestShell.testapp2();
+
+        verify(mockDeviceDriver, times(150)).writeData(anyString(), matches("0xAAAABBBB"));
+        verify(mockDeviceDriver, times(5)).writeData(anyString(), matches("0x12345678"));
+
+        assertEquals("TestApp2 success\r\n", outputStream.toString());
+    }
+
+    @Test
+    void testapp2_fail() {
+        stubReadResult("0x87654321", 0, 5);
+
+        spyTestShell.testapp2();
+
+        verify(mockDeviceDriver, times(150)).writeData(anyString(), matches("0xAAAABBBB"));
+        verify(mockDeviceDriver, times(5)).writeData(anyString(), matches("0x12345678"));
+
+        assertEquals("TestApp2 fail\r\n", outputStream.toString());
+    }
+
+    private void stubReadResult(String data, int from, int to) {
+        Stubber stubber = doReturn(from + " " + data);
+        for (int i = from + 1; i < to; i++) {
+            stubber = stubber.doReturn(i + " " + data);
+        }
+        stubber.when(spyTestShell).readResult(anyString());
     }
 }
