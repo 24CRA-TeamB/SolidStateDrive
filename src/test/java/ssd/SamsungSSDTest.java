@@ -15,7 +15,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SamsungSSDTest {
-    public static final String READ_DATA_TARGET_FILE = "../nand.txt";
+    public static final String READ_DATA_TARGET_FILE = "./nand.txt";
     public static final String SAMPLE_DATA_JSON_STRING = "[{\"data\":\"0x00000000\",\"lba\":\"0\"}, {\"data\":\"0x00000000\",\"lba\":\"1\"}]";
 
     @Mock
