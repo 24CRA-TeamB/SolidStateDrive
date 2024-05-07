@@ -8,8 +8,8 @@ import java.io.*;
 public class SamsungSSD implements SSDInterface{
 
     public static final String EMPTY_DATA_VALUE = "0x00000000";
-    public static final String READ_DATA_TARGET_FILE = "src/main/resources/nand.txt";
-    public static final String WRITE_READ_DATA_TARGET_FILE = "src/main/resources/result.txt";
+    public static final String NAND_TXT_PATH = "src/main/resources/nand.txt";
+    public static final String RESULT_TXT_PATH = "src/main/resources/result.txt";
 
     @Override
     public void read(String lba) {
@@ -19,7 +19,7 @@ public class SamsungSSD implements SSDInterface{
 
     private void writeResultFile(String readValue) {
         try {
-            FileWriter writer = new FileWriter(WRITE_READ_DATA_TARGET_FILE);
+            FileWriter writer = new FileWriter(RESULT_TXT_PATH);
             writer.write(readValue);
             writer.close();
         } catch (IOException e) {
@@ -53,13 +53,11 @@ public class SamsungSSD implements SSDInterface{
 
     private String getNandTextString() {
         try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(READ_DATA_TARGET_FILE));
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(NAND_TXT_PATH));
 
-            String line;
             StringBuilder stringBuilder = new StringBuilder();
-            while ((line = bufferedReader.readLine()) != null) {
-                stringBuilder.append(line);
-            }
+            stringBuilder.append(bufferedReader.readLine());
+
             bufferedReader.close();
 
             return stringBuilder.toString();
@@ -71,7 +69,7 @@ public class SamsungSSD implements SSDInterface{
     }
 
     private boolean isNandTxtNotExist() {
-        return !(new File(READ_DATA_TARGET_FILE).exists());
+        return !(new File(NAND_TXT_PATH).exists());
     }
 
     private String getTargetLbaData(JSONObject readData) {
