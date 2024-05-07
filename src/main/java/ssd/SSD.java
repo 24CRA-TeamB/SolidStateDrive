@@ -20,25 +20,10 @@ public class SSD {
             createNandFile();
         }
 
-        Scanner scanner = new Scanner(System.in);
-
-        String cmd = scanner.nextLine();
-        if (isCmdEmpty(cmd)){
-            scanner.close();
+        if(isInvalidCommand(args))
             return;
-        }
 
-
-        String[] cmdArgs = cmd.split(" ");
-
-        if(isInvalidCommand(cmdArgs)){
-            scanner.close();
-            return;
-        }
-
-        doCommand(cmdArgs);
-
-        scanner.close();
+        doCommand(args);
     }
 
     private static void doCommand(String[] cmdArgs) {
