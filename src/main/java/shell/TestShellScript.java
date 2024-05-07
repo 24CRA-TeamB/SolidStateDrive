@@ -53,12 +53,12 @@ public class TestShellScript {
                 break;
             case WRITE:
                 if (NUMBER_OF_ARGUMENTS_FOR_WRITE == arguments.length) {
-                    testShell.write(arguments[NUMBER_OF_ARGUMENTS_FOR_FULLREAD], arguments[NUMBER_OF_ARGUMENTS_FOR_READ]);
+                    testShell.write(arguments[0], arguments[1]);
                 }
                 break;
             case FULL_WRITE:
                 if (NUMBER_OF_ARGUMENTS_FOR_FULLWRITE == arguments.length) {
-                    testShell.fullwrite(arguments[NUMBER_OF_ARGUMENTS_FOR_FULLREAD]);
+                    testShell.fullwrite(arguments[0]);
                 }
                 break;
             case HELP:
