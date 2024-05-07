@@ -61,7 +61,13 @@ public class TestShell {
     }
 
     public void help() {
-
+        System.out.println("Usage of TestShell");
+        System.out.println("write\t\twrite data at a LBA. ex) write [LBA] [Data]");
+        System.out.println("fullwrite\twrite data at all of LBA. ex) write [Data]");
+        System.out.println("read\t\tread data from a LBA. ex) read [LBA]");
+        System.out.println("fullread\tread data from all of LBA. ex) fullread");
+        System.out.println("help\t\tprint description of TestShell. ex) help");
+        System.out.println("exit\t\tend TestShell. ex) exit");
     }
 
     @VisibleForTesting
