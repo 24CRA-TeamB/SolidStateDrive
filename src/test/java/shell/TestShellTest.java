@@ -8,6 +8,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -36,6 +37,8 @@ class TestShellTest {
             + "fullread\tread data from all of LBA. ex) fullread\r\n"
             + "help\t\tprint description of TestShell. ex) help\r\n"
             + "exit\t\tend TestShell. ex) exit\r\n";
+    private static final String NOT_EXISTED_FILE = "not_existed_file.txt";
+
     @Spy
     TestShell spyTestShell;
 
@@ -99,12 +102,12 @@ class TestShellTest {
         verify(mockDeviceDriver, times(100)).readData(anyString());
     }
 
-    @Test
-    void printSuccess(@TempDir Path tempDir) throws IOException {
+    @ParameterizedTest
+    @ValueSource(strings = {"123", "aaa", "0xFF"})
+    void printSuccess(String input, @TempDir Path tempDir) throws IOException {
         Path filePath = tempDir.resolve(RESULT_FILE);
         Files.createFile(filePath);
 
-        String input = "123";
         Files.write(filePath, input.getBytes());
 
         spyTestShell.print(filePath.toString());
@@ -115,12 +118,10 @@ class TestShellTest {
 
     @Test
     void printFail() {
-        String file = "not_existed_file.txt";
-
-        spyTestShell.print(file);
+        spyTestShell.print(NOT_EXISTED_FILE);
 
         String actual = outputStream.toString().trim();
-        String expected = "Failed to read result. " + file;
+        String expected = "Failed to read result. " + NOT_EXISTED_FILE;
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -131,8 +132,6 @@ class TestShellTest {
 
     @Test
     void help() {
-
-
         spyTestShell.help();
 
         assertEquals(HELP_DESCRIPTION, outputStream.toString());
