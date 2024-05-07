@@ -1,7 +1,6 @@
 package shell;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -78,82 +77,6 @@ class TestShellScriptTest {
             assertEquals(arguments[i], actualArguments[i]);
         }
     }
-
-//    @Test
-//    void runTestShellWithCommand_read() {
-//        String command = "read";
-//        String[] arguments = new String[] {"3"};
-//
-//        TestShellScript.runTestShellWithCommand(mockTestShell, command, arguments);
-//
-//        verify(mockTestShell, times(1)).read(matches("3"));
-//    }
-//
-//    @Test
-//    void runTestShellWithCommand_fullread() {
-//        String command = "fullread";
-//        String[] arguments = new String[] {};
-//
-//        TestShellScript.runTestShellWithCommand(mockTestShell, command, arguments);
-//
-//        verify(mockTestShell, times(1)).fullRead();
-//    }
-//
-//
-//    @Test
-//    void runTestShellWithCommand_write() {
-//        String command = "write";
-//        String[] arguments = new String[] {"37", "0xC38293FF"};
-//
-//        TestShellScript.runTestShellWithCommand(mockTestShell, command, arguments);
-//
-//        verify(mockTestShell, times(1)).write(matches("37"), matches("0xC38293FF"));
-//    }
-//
-//    @Test
-//    void runTestShellWithCommand_fullwrite() {
-//        String command = "fullwrite";
-//        String[] arguments = new String[] {"0xC38293FF"};
-//
-//        TestShellScript.runTestShellWithCommand(mockTestShell, command, arguments);
-//
-//        verify(mockTestShell, times(1)).fullwrite(matches("0xC38293FF"));
-//    }
-//
-//    @Test
-//    void runTestShellWithCommand_help() {
-//        String command = "help";
-//        String[] arguments = new String[] {};
-//
-//        TestShellScript.runTestShellWithCommand(mockTestShell, command, arguments);
-//
-//        verify(mockTestShell, times(1)).help();
-//    }
-//
-//    @Test
-//    void runTestShellWithCommand_exit() {
-//        String command = "exit";
-//        String[] arguments = new String[] {};
-//
-//        TestShellScript.runTestShellWithCommand(mockTestShell, command, arguments);
-//
-//        verify(mockTestShell, times(1)).exit();
-//    }
-//
-//    @Test
-//    void runTestShell_testapp1() {
-//        doReturn()
-//        doReturn(true).when(mockTestShell).verifyTestApp1Result(anyString());
-//        String command = TestShellScript.TESTAPP1;
-//        String[] emptyArguments = new String[]{};
-//
-//        TestShellScript.runTestShellWithCommand(mockTestShell, command, emptyArguments);
-//
-//        verify(mockTestShell, times(1)).fullwrite(anyString());
-//        verify(mockTestShell, times(1)).fullRead();
-//        verify(mockTestShell, times(1)).verifyTestApp1Result(anyString());
-//        System.out.println(outputStream.toString());
-//    }
 
     static Stream<Arguments> getInputCommandAndExpectedList() {
         return Stream.of(
