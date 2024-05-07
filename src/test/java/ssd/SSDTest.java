@@ -36,6 +36,123 @@ class SSDTest {
     }
 
     @Test
+    @DisplayName("commandCode 값이 W 또는 R 아닌 값이 전달될 때, true 반환한다")
+    void givenWorRCommandCode_whenCheckInvalidCommand_returnTrue(){
+        // given
+        setReadCommand("S", "15");
+
+        // when
+        boolean isInvalid = ssd.isInvalidCommand(readCommand);
+
+        // then
+        assertTrue(isInvalid);
+    }
+
+    @Test
+    @DisplayName("parseInt 할 수 없는 lba 값이 전달되는 경우 true 반환한다")
+    void givenInvalidLba_whenCheckInvalidCommand_returnTrue(){
+        // given
+        setReadCommand("R", "X");
+
+        // when
+        boolean isInvalid = ssd.isInvalidCommand(readCommand);
+
+        // then
+        assertTrue(isInvalid);
+    }
+
+    @Test
+    @DisplayName("음수 LBA 가 전달되는 경우 true 반환한다")
+    void givenOutOfRangeLbaMinus_whenCheckValidCommand_returnTrue(){
+        // given
+        setReadCommand("R", "-1");
+
+        // when
+        boolean isInvalid = ssd.isInvalidCommand(readCommand);
+
+        // then
+        assertTrue(isInvalid);
+    }
+
+    @Test
+    @DisplayName("100 이상의 LBA 가 전달되는 경우 true 반환한다")
+    void givenOutOfRangeLba100_whenCheckValidCommand_returnTrue(){
+        // given
+        setReadCommand("R", "100");
+
+        // when
+        boolean isInvalid = ssd.isInvalidCommand(readCommand);
+
+        // then
+        assertTrue(isInvalid);
+    }
+
+    @Test
+    @DisplayName("lba 값이 유효하고 명령어가 R인 경우 false 반환한다")
+    void givenValidLbaAndRead_whenCheckValidCommand_returnTrue(){
+        // given
+        setReadCommand("R", "99");
+
+        // when
+        boolean isInvalid = ssd.isInvalidCommand(readCommand);
+
+        // then
+        assertFalse(isInvalid);
+    }
+
+    @Test
+    @DisplayName("lba 값이 유효하고 명령어가 W인 경우 데이터가 0x 로 시작하지 않으면 true 반환한다")
+    void givenValidLbaAndWrite_whenCheckValidCommand_returnTrue(){
+        // given
+        setWriteCommand("W", "99", "0a01103302");
+
+        // when
+        boolean isInvalid = ssd.isInvalidCommand(writeCommand);
+
+        // then
+        assertTrue(isInvalid);
+    }
+
+    @Test
+    @DisplayName("lba 값이 유효하고 명령어가 W인 경우 데이터 길이가 10이 아니면 true 반환한다")
+    void givenValidLbaAndWriteAndLengthIsNot10_whenCheckValidCommand_returnTrue(){
+        // given
+        setWriteCommand("W", "99", "0x011033021");
+
+        // when
+        boolean isInvalid = ssd.isInvalidCommand(writeCommand);
+
+        // then
+        assertTrue(isInvalid);
+    }
+
+    @Test
+    @DisplayName("lba 값이 유효하고 명령어가 W인 경우 데이터가 16진수 범위가 아니면 true 반환한다")
+    void givenValidLbaAndWriteAndNotHexa_whenCheckValidCommand_returnTrue(){
+        // given
+        setWriteCommand("W", "99", "0x0119010K");
+
+        // when
+        boolean isInvalid = ssd.isInvalidCommand(writeCommand);
+
+        // then
+        assertTrue(isInvalid);
+    }
+
+    @Test
+    @DisplayName("유효한 W 명령어가 전달된 경우 false 를 반환한다")
+    void givenValidWrite_whenCheckValidCommand_returnTrue(){
+        // given
+        setWriteCommand("W", "99", "0x0119010A");
+
+        // when
+        boolean isInvalid = ssd.isInvalidCommand(writeCommand);
+
+        // then
+        assertFalse(isInvalid);
+    }
+
+    @Test
     @DisplayName("doCommand 명령어를 수행했을 때 read 명령어가 반드시 1회 수행된다 ")
     void doCommand() {
         // given
@@ -50,12 +167,12 @@ class SSDTest {
 
     @Test
     @DisplayName("lba 에 유효하지 않은 데이터 X가 전달될 때 유효성을 검증한다")
-    void isImpossibleToParseToInt() {
+    void givenInvalid_lba_X_whenCheckValid_thenIsImpossibleToParseToInt() {
         // given
 
 
         // when
-        setWriteCommand("W", "1", "0x12345678");
+        setWriteCommand("W", "X", "0x12345678");
 
         // then
         assertEquals(true, ssd.isImpossibleToParseToInt(writeCommand[1]));
@@ -106,8 +223,8 @@ class SSDTest {
         writeCommand[2] = data;
     }
 
-    private void setReadCommand(String writeCode, String lba){
-        readCommand[1] = writeCode;
-        readCommand[2] = lba;
+    private void setReadCommand(String readCode, String lba){
+        readCommand[0] = readCode;
+        readCommand[1] = lba;
     }
 }
