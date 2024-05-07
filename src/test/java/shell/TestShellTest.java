@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.OngoingStubbing;
 import ssd.DeviceDriver;
 
 import java.io.ByteArrayOutputStream;
@@ -50,6 +51,7 @@ class TestShellTest {
 
     @BeforeEach
     void setUp() {
+        lenient().doNothing().when(mockDeviceDriver).writeData(anyString(), anyString());
         spyTestShell.setDeviceDriver(mockDeviceDriver);
 
         outputStream = new ByteArrayOutputStream();
@@ -152,5 +154,37 @@ class TestShellTest {
                 Arguments.arguments("0xAAAABBBB"),
                 Arguments.arguments("0xFFFFFFFF")
         );
+    }
+
+    @Test
+    void testapp1() {
+        doNothing().when(spyTestShell).fullwrite(anyString());
+        setReadResultStubbing("0x12345678", 0, 100);
+
+        spyTestShell.testapp1();
+
+        verify(spyTestShell, times(1)).fullwrite(anyString());
+        verify(spyTestShell, times(1)).new_fullread();
+
+        assertEquals("TestApp1 success\r\n", outputStream.toString());
+    }
+
+    @Test
+    void testapp2() {
+        setReadResultStubbing("0x12345678", 0, 5);
+
+        spyTestShell.testapp2();
+
+        verify(spyTestShell, times(150)).write(anyString(), matches("0xAAAABBBB"));
+        verify(spyTestShell, times(5)).write(anyString(), matches("0x12345678"));
+
+        assertEquals("TestApp2 success\r\n", outputStream.toString());
+    }
+
+    private void setReadResultStubbing(String data, int from, int to) {
+        OngoingStubbing<String> stub = when(spyTestShell.readResult(anyString()));
+        for (int i = from; i < to; i++) {
+            stub = stub.thenReturn(i + " " + data);
+        }
     }
 }
