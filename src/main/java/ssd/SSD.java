@@ -6,15 +6,22 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Scanner;
 
 public class SSD {
     public static final int MIN_LBA = 0;
     public static final int MAX_LBA = 99;
     public static final String EMPTY_DATA_VALUE = "0x00000000";
-    public static final String NAND_TXT_PATH = "..\\nand.txt";
+    public static final String NAND_TXT_PATH = "../nand.txt";
+
+    static DeviceDriver deviceDriver;
+
+    public SSD(SSDInterface ssdInterface) {
+        deviceDriver = new DeviceDriver(ssdInterface);
+    }
 
     public static void main(String[] args) {
+
+        deviceDriver = new DeviceDriver(new SamsungSSD());
 
         if(!doesNandFileExist()) {
             createNandFile();
@@ -26,8 +33,7 @@ public class SSD {
         doCommand(args);
     }
 
-    private static void doCommand(String[] cmdArgs) {
-        DeviceDriver deviceDriver = new DeviceDriver(new SamsungSSD());
+    public static void doCommand(String[] cmdArgs) {
         String readOrWriteCmd = cmdArgs[0];
         String targetLba = cmdArgs[1];
 
@@ -42,11 +48,7 @@ public class SSD {
         }
     }
 
-    private static boolean isCmdEmpty(String cmd) {
-        return cmd.equals("") || cmd == null;
-    }
-
-    private static boolean isInvalidCommand(String[] cmdArgs){
+    public static boolean isInvalidCommand(String[] cmdArgs){
 
         if(!(cmdArgs[0].equals("W") || cmdArgs[0].equals("R")))
             return true;
@@ -76,7 +78,7 @@ public class SSD {
         return false;
     }
 
-    private static boolean isImpossibleToParseToInt(String lbaStr) {
+    public static boolean isImpossibleToParseToInt(String lbaStr) {
         for(int i=0; i<lbaStr.length(); i++){
             char c = lbaStr.charAt(i);
             if(!('0' <= c && c <= '9'))
@@ -85,16 +87,16 @@ public class SSD {
         return false;
     }
 
-    private static boolean isInvalidLBA(int lbaAddress) {
+    public static boolean isInvalidLBA(int lbaAddress) {
         return lbaAddress < MIN_LBA || lbaAddress > MAX_LBA;
     }
 
-    private static boolean doesNandFileExist() {
+    public static boolean doesNandFileExist() {
         File nandTxt = new File(NAND_TXT_PATH);
         return nandTxt.exists();
     }
 
-    private static void createNandFile() {
+    public static void createNandFile() {
         File nandTxtFile = new File(NAND_TXT_PATH);
         try {
             if(nandTxtFile.createNewFile()){
@@ -111,7 +113,7 @@ public class SSD {
             System.out.println("파일을 생성하는 도중 오류가 발생했습니다.");
         }
     }
-    private static void writeJsonArrayToNandTxtPath(JSONArray jsonArray) throws IOException {
+    public static void writeJsonArrayToNandTxtPath(JSONArray jsonArray) throws IOException {
         FileWriter fileWriter = new FileWriter(NAND_TXT_PATH);
         fileWriter.write(jsonArray.toString());
         fileWriter.close();
