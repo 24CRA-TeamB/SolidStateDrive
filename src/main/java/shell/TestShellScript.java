@@ -43,7 +43,7 @@ public class TestShellScript {
         switch (command) {
             case READ:
                 if (NUMBER_OF_ARGUMENTS_FOR_READ == arguments.length) {
-                    testShell.read(arguments[NUMBER_OF_ARGUMENTS_FOR_FULLREAD]);
+                    testShell.read(arguments[0]);
                 }
                 break;
             case FULL_READ:
