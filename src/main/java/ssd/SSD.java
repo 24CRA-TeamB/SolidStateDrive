@@ -1,17 +1,8 @@
 package ssd;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
 public class SSD {
     public static final int MIN_LBA = 0;
     public static final int MAX_LBA = 99;
-    public static final String EMPTY_DATA_VALUE = "0x00000000";
-    public static final String NAND_TXT_PATH = "../nand.txt";
 
     static DeviceDriver deviceDriver;
 
