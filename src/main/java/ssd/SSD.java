@@ -20,38 +20,53 @@ public class SSD {
             createNandFile();
         }
 
-        DeviceDriver deviceDriver = new DeviceDriver(new SamsungSSD());
         Scanner scanner = new Scanner(System.in);
 
-        while(true){
-            String cmd = scanner.nextLine();
-            if (cmd.equals("") || cmd == null){
-                continue;
-            }
+        String cmd = scanner.nextLine();
+        if (isCmdEmpty(cmd)){
+            scanner.close();
+            return;
+        }
 
-            String[] cmdArgs = cmd.split(" ");
 
-            if(isValidCommand(cmdArgs))
-                continue;
+        String[] cmdArgs = cmd.split(" ");
 
-            String readOrWriteCmd = cmdArgs[0];
-            String targetLba = cmdArgs[1];
+        if(isInvalidCommand(cmdArgs)){
+            scanner.close();
+            return;
+        }
 
-            switch (readOrWriteCmd){
-                case "W":
-                    String targetValue = cmdArgs[2];
-                    deviceDriver.writeData(targetLba, targetValue);
-                    break;
-                case "R":
-                    deviceDriver.readData(targetLba);
-                    break;
-            }
+        doCommand(cmdArgs);
+
+        scanner.close();
+    }
+
+    private static void doCommand(String[] cmdArgs) {
+        DeviceDriver deviceDriver = new DeviceDriver(new SamsungSSD());
+        String readOrWriteCmd = cmdArgs[0];
+        String targetLba = cmdArgs[1];
+
+        switch (readOrWriteCmd){
+            case "W":
+                String targetValue = cmdArgs[2];
+                deviceDriver.writeData(targetLba, targetValue);
+                break;
+            case "R":
+                deviceDriver.readData(targetLba);
+                break;
         }
     }
 
-    private static boolean isValidCommand(String[] cmdArgs){
+    private static boolean isCmdEmpty(String cmd) {
+        return cmd.equals("") || cmd == null;
+    }
+
+    private static boolean isInvalidCommand(String[] cmdArgs){
 
         if(!(cmdArgs[0].equals("W") || cmdArgs[0].equals("R")))
+            return true;
+
+        if(isImpossibleToParseToInt(cmdArgs[1]))
             return true;
 
         if(isInvalidLBA(Integer.parseInt(cmdArgs[1])))
@@ -73,6 +88,15 @@ public class SSD {
                 return true;
         }
 
+        return false;
+    }
+
+    private static boolean isImpossibleToParseToInt(String lbaStr) {
+        for(int i=0; i<lbaStr.length(); i++){
+            char c = lbaStr.charAt(i);
+            if(!('0' <= c && c <= '9'))
+                return true;
+        }
         return false;
     }
 
