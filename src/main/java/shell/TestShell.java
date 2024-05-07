@@ -12,10 +12,11 @@ public class TestShell {
     // TODO
     // LBA 갯수는 DeviceDriver에서 가져오도록 고민
     public static final int NUMBER_OF_LBA = 100;
-    private static final String RESULT_FILE = "result.txt";
+    static final String RESULT_FILE = "result.txt";
     private DeviceDriver deviceDriver;
 
-    public TestShell() {}
+    public TestShell() {
+    }
 
     public TestShell(DeviceDriver deviceDriver) {
         setDeviceDriver(deviceDriver);
