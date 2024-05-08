@@ -30,12 +30,14 @@ public class TestShell {
     private static final int NUMBER_OF_ARGUMENTS_FOR_FULLREAD = 0;
     private static final int NUMBER_OF_ARGUMENTS_FOR_WRITE = 2;
     private static final int NUMBER_OF_ARGUMENTS_FOR_FULLWRITE = 1;
+    private static final int NUMBER_OF_ARGUMENTS_FOR_ERASE_RANGE = 2;
     private static final int NUMBER_OF_ARGUMENTS_FOR_HELP = 0;
     private static final int NUMBER_OF_ARGUMENTS_FOR_EXIT = 0;
     private static final int NUMBER_OF_ARGUMENTS_FOR_TESTAPP1 = 0;
     private static final int NUMBER_OF_ARGUMENTS_FOR_TESTAPP2 = 0;
 
     public static final int NUMBER_OF_LBA = 100;
+    public static final int ERASE_CAPACITY = 10;
     static final String RESULT_FILE = "result.txt";
     private final HashMap<String, Method> methodFactory = new HashMap<>();
     private SSDExecutor ssdExecutor;
@@ -149,7 +151,34 @@ public class TestShell {
     }
 
     public void erase_range(String[] arguments) {
+        if (NUMBER_OF_ARGUMENTS_FOR_ERASE_RANGE != arguments.length) {
+            return;
+        }
 
+        if (isNotNumberFormat(arguments[0]) || isNotNumberFormat(arguments[1])) {
+            return;
+        }
+
+        int startLBA = Math.max(Integer.parseInt(arguments[0]), 0);
+        int endLBA = Math.min(Integer.parseInt(arguments[1]), NUMBER_OF_LBA);
+        int remainSize = endLBA - startLBA;
+
+        int lba = startLBA;
+        while (remainSize > 0) {
+            int size = Math.min(remainSize, ERASE_CAPACITY);
+            erase(new String[]{Integer.toString(lba), Integer.toString(size)});
+            remainSize -= size;
+            lba += size;
+        }
+    }
+
+    private boolean isNotNumberFormat(String numberString) {
+        try {
+            Integer.parseInt(numberString);
+            return false;
+        } catch (NullPointerException | NumberFormatException e) {
+            return true;
+        }
     }
 
     public void exit(String[] arguments) {
