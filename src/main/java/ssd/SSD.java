@@ -36,8 +36,15 @@ public class SSD {
     }
 
     public static boolean isInvalidCommand(String[] cmdArgs){
+        if(cmdArgs == null || cmdArgs.length < 2) return true;
 
         if(!(cmdArgs[0].equals("W") || cmdArgs[0].equals("R")))
+            return true;
+
+        if(cmdArgs[0].equals("R") && cmdArgs.length!=2)
+            return true;
+
+        if(cmdArgs[0].equals("W") && cmdArgs.length!=3)
             return true;
 
         if(isImpossibleToParseToInt(cmdArgs[1]))
@@ -67,9 +74,9 @@ public class SSD {
     public static boolean isImpossibleToParseToInt(String lbaStr) {
         try {
             Integer.parseInt(lbaStr);
-            return true;
-        } catch (NumberFormatException e) {
             return false;
+        } catch (NumberFormatException e) {
+            return true;
         }
     }
 

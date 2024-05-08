@@ -216,6 +216,79 @@ class SSDTest {
         assertFalse(success);
     }
 
+    @Test
+    void invalidArgumentTC01(){
+        boolean isInvalid = ssd.isInvalidCommand(null);
+
+        assertTrue(isInvalid);
+    }
+
+    @Test
+    void invalidArgumentTC02(){
+        String[] args = new String[1];
+        args[0] = "W";
+
+        boolean isInvalid = ssd.isInvalidCommand(args);
+
+        assertTrue(isInvalid);
+    }
+
+    @Test
+    void invalidArgumentTC03(){
+        String[] args = new String[1];
+        args[0] = "R";
+
+        boolean isInvalid = ssd.isInvalidCommand(args);
+
+        assertTrue(isInvalid);
+    }
+
+    @Test
+    void invalidArgumentTC04(){
+        String[] args = new String[2];
+        args[0] = "W";
+        args[1] = "33";
+
+        boolean isInvalid = ssd.isInvalidCommand(args);
+
+        assertTrue(isInvalid);
+    }
+
+    @Test
+    void invalidArgumentTC05(){
+        String[] args = new String[3];
+        args[0] = "W";
+        args[1] = "29";
+        args[2] = "0x223123";
+
+        boolean isInvalid = ssd.isInvalidCommand(args);
+
+        assertTrue(isInvalid);
+    }
+
+    @Test
+    void invalidArgumentTC06(){
+        String[] args = new String[3];
+        args[0] = "R";
+        args[1] = "99";
+        args[2] = "0x22312323";
+
+        boolean isInvalid = ssd.isInvalidCommand(args);
+
+        assertTrue(isInvalid);
+    }
+
+    @Test
+    void invalidArgumentTC07(){
+        String[] args = new String[2];
+        args[0] = "R";
+        args[1] = "W";
+
+        boolean isInvalid = ssd.isInvalidCommand(args);
+
+        assertTrue(isInvalid);
+    }
+
     private void setWriteCommand(String writeCode, String lba, String data){
         writeCommand[0] = writeCode;
         writeCommand[1] = lba;
