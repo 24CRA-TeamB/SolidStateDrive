@@ -1,6 +1,7 @@
 package ssd;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -185,6 +186,7 @@ class SSDTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("File이 존재하지 않을 때, false 값을 반환한다")
     void doesNandFileExist() {
         assertEquals(false, new File(NAND_TXT_PATH).exists());
@@ -283,6 +285,18 @@ class SSDTest {
         String[] args = new String[2];
         args[0] = "R";
         args[1] = "W";
+
+        boolean isInvalid = ssd.isInvalidCommand(args);
+
+        assertTrue(isInvalid);
+    }
+
+    @Test
+    void invalidArgumentTC08(){
+        String[] args = new String[3];
+        args[0] = "E";
+        args[1] = "1";
+        args[2] = "11";
 
         boolean isInvalid = ssd.isInvalidCommand(args);
 

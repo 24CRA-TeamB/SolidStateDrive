@@ -42,37 +42,60 @@ public class SSD {
     public static boolean isInvalidCommand(String[] cmdArgs){
         if(cmdArgs == null || cmdArgs.length < 2) return true;
 
-        if(!(cmdArgs[0].equals("W") || cmdArgs[0].equals("R")))
-            return true;
+        if(cmdArgs[0].equals("R")){
+            // length test
+            if(cmdArgs.length != 2) return true;
 
-        if(cmdArgs[0].equals("R") && cmdArgs.length!=2)
-            return true;
-
-        if(cmdArgs[0].equals("W") && cmdArgs.length!=3)
-            return true;
-
-        if(isImpossibleToParseToInt(cmdArgs[1]))
-            return true;
-
-        if(isInvalidLBA(Integer.parseInt(cmdArgs[1])))
-            return true;
-
-        if(cmdArgs[0].equals("R"))
-            return false;
-
-        if(!cmdArgs[2].startsWith("0x"))
-            return true;
-
-        if(cmdArgs[2].length()!=10)
-            return true;
-
-        for(int i=2; i<cmdArgs[2].length(); i++){
-            char c = cmdArgs[2].charAt(i);
-            if(!(('0' <= c && c <= '9') || ('A' <= c && c <= 'F')))
+            // parse int test
+            if(isImpossibleToParseToInt(cmdArgs[1]))
                 return true;
-        }
 
-        return false;
+            // invalid lba test
+            if(isInvalidLBA(Integer.parseInt(cmdArgs[1])))
+                return true;
+
+            return false;
+        }
+        else if(cmdArgs[0].equals("W")){
+            // length test
+            if(cmdArgs.length != 3) return true;
+
+            // parse int test
+            if(isImpossibleToParseToInt(cmdArgs[1]))
+                return true;
+
+            // invalid lba test
+            if(isInvalidLBA(Integer.parseInt(cmdArgs[1])))
+                return true;
+
+            // data validation
+            if(!cmdArgs[2].startsWith("0x") || cmdArgs[2].length()!=10)
+                return true;
+
+            // hexa validation
+            for(int i=2; i<cmdArgs[2].length(); i++){
+                char c = cmdArgs[2].charAt(i);
+                if(!(('0' <= c && c <= '9') || ('A' <= c && c <= 'F')))
+                    return true;
+            }
+
+            return false;
+        }
+        else if(cmdArgs[0].equals("E")){
+            // length test
+            if(cmdArgs.length != 3) return true;
+
+            // parse int test
+            if(isImpossibleToParseToInt(cmdArgs[1]))
+                return true;
+
+            // invalid lba test
+            if(isInvalidLBA(Integer.parseInt(cmdArgs[1])))
+                return true;
+
+            return false;
+        }
+        else return true;
     }
 
     public static boolean isImpossibleToParseToInt(String lbaStr) {
