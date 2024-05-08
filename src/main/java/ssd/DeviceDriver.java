@@ -18,4 +18,8 @@ public class DeviceDriver {
     public void writeData(String lba, String data){
         ssdInterface.write(lba, data);
     }
+
+    public void eraseData(String lba, String size){
+        ssdInterface.erase(lba, size);
+    }
 }
