@@ -13,6 +13,7 @@ public class SamsungSSD implements SSDInterface{
 
     public SamsungSSD() {
         createNandTextFile();
+        initResultFile();
     }
 
     private void createNandTextFile() {
@@ -42,6 +43,10 @@ public class SamsungSSD implements SSDInterface{
         } catch (IOException e) {
             System.out.println("파일을 생성하는 도중 오류가 발생했습니다.");
         }
+    }
+
+    private void initResultFile() {
+        writeResultFile("");
     }
 
     @Override
