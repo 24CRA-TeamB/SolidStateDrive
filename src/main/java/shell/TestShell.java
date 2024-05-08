@@ -164,7 +164,7 @@ public class TestShell {
             return;
         }
 
-        erazeSplit(size, lba);
+        eraseSplit(size, lba);
     }
 
     public void erase_range(String[] arguments) {
@@ -179,18 +179,18 @@ public class TestShell {
         int startLBA = Integer.parseInt(arguments[0]);
         int endLBA = Integer.parseInt(arguments[1]);
 
-        erazeSplit(startLBA, endLBA - startLBA);
+        eraseSplit(startLBA, endLBA - startLBA);
     }
 
-    private void erazeSplit(int size, int lba) {
+    private void eraseSplit(int size, int lba) {
         while (size > 0) {
-            int erazeSize = Math.min(size, MAX_ERASE_SIZE);
+            int eraseSize = Math.min(size, MAX_ERASE_SIZE);
 
-            if (lba + erazeSize > NUMBER_OF_LBA) {
-                erazeSize = NUMBER_OF_LBA - lba;
+            if (lba + eraseSize > NUMBER_OF_LBA) {
+                eraseSize = NUMBER_OF_LBA - lba;
             }
 
-            ssdExecutor.eraseData(String.valueOf(lba), String.valueOf(erazeSize));
+            ssdExecutor.eraseData(String.valueOf(lba), String.valueOf(eraseSize));
             size -= MAX_ERASE_SIZE;
             lba += MAX_ERASE_SIZE;
         }
