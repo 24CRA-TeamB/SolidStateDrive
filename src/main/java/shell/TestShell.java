@@ -152,6 +152,10 @@ public class TestShell {
             return;
         }
 
+        if (isNotNumberFormat(arguments[0]) || isNotNumberFormat(arguments[1])) {
+            return;
+        }
+
         int lba = Integer.parseInt(arguments[0]);
         int size = Integer.parseInt(arguments[1]);
 
@@ -160,17 +164,7 @@ public class TestShell {
             return;
         }
 
-        while (size > 0) {
-            int erazeSize = Math.min(size, MAX_ERASE_SIZE);
-
-            if (lba + erazeSize > NUMBER_OF_LBA) {
-                erazeSize = NUMBER_OF_LBA - lba;
-            }
-
-            ssdExecutor.eraseData(String.valueOf(lba), String.valueOf(erazeSize));
-            size -= MAX_ERASE_SIZE;
-            lba += MAX_ERASE_SIZE;
-        }
+        erazeSplit(size, lba);
     }
 
     public void erase_range(String[] arguments) {
@@ -182,16 +176,23 @@ public class TestShell {
             return;
         }
 
-        int startLBA = Math.max(Integer.parseInt(arguments[0]), 0);
-        int endLBA = Math.min(Integer.parseInt(arguments[1]), NUMBER_OF_LBA);
-        int remainSize = endLBA - startLBA;
+        int startLBA = Integer.parseInt(arguments[0]);
+        int endLBA = Integer.parseInt(arguments[1]);
 
-        int lba = startLBA;
-        while (remainSize > 0) {
-            int size = Math.min(remainSize, MAX_ERASE_SIZE);
-            erase(new String[]{Integer.toString(lba), Integer.toString(size)});
-            remainSize -= size;
-            lba += size;
+        erazeSplit(startLBA, endLBA - startLBA);
+    }
+
+    private void erazeSplit(int size, int lba) {
+        while (size > 0) {
+            int erazeSize = Math.min(size, MAX_ERASE_SIZE);
+
+            if (lba + erazeSize > NUMBER_OF_LBA) {
+                erazeSize = NUMBER_OF_LBA - lba;
+            }
+
+            ssdExecutor.eraseData(String.valueOf(lba), String.valueOf(erazeSize));
+            size -= MAX_ERASE_SIZE;
+            lba += MAX_ERASE_SIZE;
         }
     }
 
