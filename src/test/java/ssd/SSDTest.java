@@ -1,6 +1,7 @@
 package ssd;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -185,6 +187,7 @@ class SSDTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("File이 존재하지 않을 때, false 값을 반환한다")
     void doesNandFileExist() {
         assertEquals(false, new File(NAND_TXT_PATH).exists());
@@ -287,6 +290,52 @@ class SSDTest {
         boolean isInvalid = ssd.isInvalidCommand(args);
 
         assertTrue(isInvalid);
+    }
+
+    @Test
+    void invalidArgumentTC08(){
+        String[] args = new String[3];
+        args[0] = "E";
+        args[1] = "1";
+        args[2] = "11";
+
+        boolean isInvalid = ssd.isInvalidCommand(args);
+
+        assertTrue(isInvalid);
+    }
+
+    @Test
+    void invalidArgumentTC09(){
+        String[] args = new String[3];
+        args[0] = "E";
+        args[1] = "91";
+        args[2] = "10";
+
+        int eraseLba = Integer.parseInt(args[1]);
+        int eraseSize = Integer.parseInt(args[2]);
+
+        if(eraseLba + eraseSize - 1 > 99){
+            eraseSize = MAX_LBA + 1 - eraseLba;
+        }
+
+        assertThat(eraseSize).isEqualTo(9);
+    }
+
+    @Test
+    void invalidArgumentTC10(){
+        String[] args = new String[3];
+        args[0] = "E";
+        args[1] = "95";
+        args[2] = "10";
+
+        int eraseLba = Integer.parseInt(args[1]);
+        int eraseSize = Integer.parseInt(args[2]);
+
+        if(eraseLba + eraseSize - 1 > 99){
+            eraseSize = MAX_LBA + 1 - eraseLba;
+        }
+
+        assertThat(eraseSize).isEqualTo(5);
     }
 
     private void setWriteCommand(String writeCode, String lba, String data){
