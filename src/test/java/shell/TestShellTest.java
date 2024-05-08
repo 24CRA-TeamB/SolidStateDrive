@@ -18,6 +18,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.stream.Stream;
 import java.io.PrintStream;
 
@@ -75,7 +76,7 @@ class TestShellTest {
     void writeNormally(String lba, String data) {
         doNothing().when(mockSSDExecutor).writeData(lba, data);
 
-        testShell.write(new String[] {lba, data});
+        testShell.write(new String[]{lba, data});
 
         verify(mockSSDExecutor, times(1)).writeData(lba, data);
     }
@@ -92,7 +93,7 @@ class TestShellTest {
 
     @Test
     void read() {
-        String[] arguments = new String[] {"10"};
+        String[] arguments = new String[]{"10"};
 
         testShell.read(arguments);
 
@@ -101,11 +102,62 @@ class TestShellTest {
 
     @Test
     void fullRead() {
-        String[] arguments = new String[] {};
+        String[] arguments = new String[]{};
 
         testShell.fullread(arguments);
 
         verify(mockSSDExecutor, times(100)).readData(anyString());
+    }
+
+    @Test
+    void eraseRange_InvalidArguments() {
+        ArrayList<String[]> invalidArugments = new ArrayList<>();
+        invalidArugments.add(new String[]{});
+        invalidArugments.add(new String[] {"1", "2", "3"});
+        invalidArugments.add(new String[] {"aa", "bb"});
+        invalidArugments.add(new String[] {"aa", "2"});
+        invalidArugments.add(new String[] {"1", "bb"});
+
+        invalidArugments.forEach(arguments -> testShell.erase_range(arguments));
+
+        verify(testShell, times(0)).erase(any());
+    }
+
+    @ParameterizedTest
+    @MethodSource("getValidSingleEraseRangeArguments")
+    void eraseRange_withinEraseCapacity(String[] arguments) {
+        testShell.erase_range(arguments);
+
+        verify(testShell, times(1)).erase(any());
+    }
+
+    static Stream<Arguments> getValidSingleEraseRangeArguments() {
+        return Stream.of(
+                Arguments.arguments((Object) new String[] {"0", "9"}),
+                Arguments.arguments((Object) new String[] {"11", "12"}),
+                Arguments.arguments((Object) new String[] {"0", "10"}),
+                Arguments.arguments((Object) new String[] {"25", "34"})
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("getValidMultipleEraseRangeArguments")
+    void eraseRange_withinEraseCapacity(String[] arguments, int expectedTimes) {
+        testShell.erase_range(arguments);
+
+        verify(testShell, times(expectedTimes)).erase(any());
+    }
+
+    static Stream<Arguments> getValidMultipleEraseRangeArguments() {
+        return Stream.of(
+                Arguments.arguments(new String[] {"0", "99"}, 10),
+                Arguments.arguments(new String[] {"11", "50"}, 4),
+                Arguments.arguments(new String[] {"11", "52"}, 5),
+                Arguments.arguments(new String[] {"43", "27"}, 0),
+                Arguments.arguments(new String[] {"78", "94"}, 2),
+                Arguments.arguments(new String[] {"78", "190"}, 3),
+                Arguments.arguments(new String[] {"-100", "100"}, 10)
+        );
     }
 
     @ParameterizedTest
@@ -128,6 +180,46 @@ class TestShellTest {
         String expected = "Failed to read result. " + NOT_EXISTED_FILE;
 
         assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void eraseSizeZero() {
+        testShell.erase(new String[]{"1", "0"});
+
+        String expected = "can not erase with size 0";
+        String actual = outputStream.toString().trim();
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void eraseOnce() {
+        doNothing().when(mockSSDExecutor).eraseData(any(), any());
+
+        testShell.erase(new String[]{"1", "5"});
+
+        verify(mockSSDExecutor, times(1)).eraseData("1", "5");
+    }
+
+    @Test
+    void eraseMultiple() {
+        doNothing().when(mockSSDExecutor).eraseData(any(), any());
+
+        testShell.erase(new String[]{"1", "23"});
+
+        verify(mockSSDExecutor, times(1)).eraseData("1", "10");
+        verify(mockSSDExecutor, times(1)).eraseData("11", "10");
+        verify(mockSSDExecutor, times(1)).eraseData("21", "3");
+    }
+
+    @Test
+    void eraseOverMaxLba() {
+        doNothing().when(mockSSDExecutor).eraseData(any(), any());
+
+        testShell.erase(new String[]{"85", "20"});
+
+        verify(mockSSDExecutor, times(1)).eraseData("85", "10");
+        verify(mockSSDExecutor, times(1)).eraseData("95", "5");
     }
 
     @Test
