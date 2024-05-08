@@ -1,6 +1,8 @@
 package shell;
 
 
+import org.assertj.core.util.VisibleForTesting;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,7 +18,7 @@ public class TestShell {
     public static final String EXIT = "exit";
     public static final String TESTAPP1 = "testapp1";
     public static final String TESTAPP2 = "testapp2";
-    private static final String[] EMPTY_ARGUMENTS = new String[] {};
+    private static final String[] EMPTY_ARGUMENTS = new String[]{};
 
     private static final int NUMBER_OF_ARGUMENTS_FOR_READ = 1;
     private static final int NUMBER_OF_ARGUMENTS_FOR_FULLREAD = 0;
@@ -29,6 +31,11 @@ public class TestShell {
     static final String RESULT_FILE = "result.txt";
 
     private SSDExecutor ssdExecutor;
+
+    @VisibleForTesting
+    TestShell() {
+        // for test
+    }
 
     public TestShell(SSDExecutor ssdExecutor) {
         this.ssdExecutor = ssdExecutor;
@@ -79,7 +86,7 @@ public class TestShell {
         }
 
         for (int i = 0; i < NUMBER_OF_LBA; i++) {
-            write(new String[] {Integer.toString(i), arguments[0]});
+            write(new String[]{Integer.toString(i), arguments[0]});
         }
     }
 
@@ -113,6 +120,7 @@ public class TestShell {
     public void fullreadAndPrint(String[] arguments) {
         fullread(arguments).forEach(System.out::println);
     }
+
     public void exit(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_EXIT != arguments.length) {
             return;
@@ -137,24 +145,24 @@ public class TestShell {
     }
 
     public void testapp1() {
-        fullwrite(new String[] {"0x12345678"});
-        ArrayList<String> result = fullread(new String[] {});
+        fullwrite(new String[]{"0x12345678"});
+        ArrayList<String> result = fullread(new String[]{});
         verifyTestApp1(result);
     }
 
     public void testapp2() {
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 30; j++) {
-                write(new String[] {Integer.toString(i), "0xAAAABBBB"});
+                write(new String[]{Integer.toString(i), "0xAAAABBBB"});
             }
         }
 
         for (int i = 0; i < 5; i++) {
-            write(new String[] {Integer.toString(i), "0x12345678"});
+            write(new String[]{Integer.toString(i), "0x12345678"});
         }
 
         ArrayList<String> result = new ArrayList<>();
-        for (int i = 0; i < 5; i++){
+        for (int i = 0; i < 5; i++) {
             result.add(read(new String[]{Integer.toString(i)}));
         }
 
@@ -201,5 +209,10 @@ public class TestShell {
             System.out.println("Failed to read result. " + e.getMessage());
             return "";
         }
+    }
+
+    @VisibleForTesting
+    void setSSDExecutor(SSDExecutor ssdExecutor) {
+        this.ssdExecutor = ssdExecutor;
     }
 }

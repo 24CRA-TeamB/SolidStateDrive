@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Stubber;
 
@@ -42,6 +43,7 @@ class TestShellTest {
     @Mock
     SSDExecutor mockSSDExecutor;
 
+    @Spy
     TestShell testShell;
 
     private PrintStream originalOut;
@@ -49,11 +51,13 @@ class TestShellTest {
 
     TestShellTest() {
         mockSSDExecutor = new SSDExecutor(SSD_JAR);
+        testShell = new TestShell();
     }
 
     @BeforeEach
     void setUp() {
-        testShell = new TestShell(mockSSDExecutor);
+        testShell.setSSDExecutor(mockSSDExecutor);
+
         lenient().doNothing().when(mockSSDExecutor).writeData(anyString(), anyString());
 
         outputStream = new ByteArrayOutputStream();
@@ -99,7 +103,7 @@ class TestShellTest {
     void fullRead() {
         String[] arguments = new String[] {};
 
-        testShell.fullRead(arguments);
+        testShell.fullread(arguments);
 
         verify(mockSSDExecutor, times(100)).readData(anyString());
     }
@@ -171,6 +175,7 @@ class TestShellTest {
     @Test
     void testapp1_fail() {
         doNothing().when(testShell).fullwrite(any());
+
         stubReadResult("0x87654321", 0, 100);
 
         testShell.testapp1();
