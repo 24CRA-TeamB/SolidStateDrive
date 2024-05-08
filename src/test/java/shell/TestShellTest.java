@@ -75,7 +75,7 @@ class TestShellTest {
     void writeNormally(String lba, String data) {
         doNothing().when(mockSSDExecutor).writeData(lba, data);
 
-        testShell.write(new String[] {lba, data});
+        testShell.write(new String[]{lba, data});
 
         verify(mockSSDExecutor, times(1)).writeData(lba, data);
     }
@@ -92,7 +92,7 @@ class TestShellTest {
 
     @Test
     void read() {
-        String[] arguments = new String[] {"10"};
+        String[] arguments = new String[]{"10"};
 
         testShell.read(arguments);
 
@@ -101,7 +101,7 @@ class TestShellTest {
 
     @Test
     void fullRead() {
-        String[] arguments = new String[] {};
+        String[] arguments = new String[]{};
 
         testShell.fullread(arguments);
 
@@ -128,6 +128,46 @@ class TestShellTest {
         String expected = "Failed to read result. " + NOT_EXISTED_FILE;
 
         assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void eraseSizeZero() {
+        testShell.erase(new String[]{"1", "0"});
+
+        String expected = "can not erase with size 0";
+        String actual = outputStream.toString().trim();
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void eraseOnce() {
+        doNothing().when(mockSSDExecutor).eraseData(any(), any());
+
+        testShell.erase(new String[]{"1", "5"});
+
+        verify(mockSSDExecutor, times(1)).eraseData("1", "5");
+    }
+
+    @Test
+    void eraseMultiple() {
+        doNothing().when(mockSSDExecutor).eraseData(any(), any());
+
+        testShell.erase(new String[]{"1", "23"});
+
+        verify(mockSSDExecutor, times(1)).eraseData("1", "10");
+        verify(mockSSDExecutor, times(1)).eraseData("11", "10");
+        verify(mockSSDExecutor, times(1)).eraseData("21", "3");
+    }
+
+    @Test
+    void eraseOverMaxLba() {
+        doNothing().when(mockSSDExecutor).eraseData(any(), any());
+
+        testShell.erase(new String[]{"85", "20"});
+
+        verify(mockSSDExecutor, times(1)).eraseData("85", "10");
+        verify(mockSSDExecutor, times(1)).eraseData("95", "5");
     }
 
     @Test
