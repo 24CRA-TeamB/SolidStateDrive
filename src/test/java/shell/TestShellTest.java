@@ -18,6 +18,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.stream.Stream;
 import java.io.PrintStream;
 
@@ -106,6 +107,57 @@ class TestShellTest {
         testShell.fullread(arguments);
 
         verify(mockSSDExecutor, times(100)).readData(anyString());
+    }
+
+    @Test
+    void eraseRange_InvalidArguments() {
+        ArrayList<String[]> invalidArugments = new ArrayList<>();
+        invalidArugments.add(new String[]{});
+        invalidArugments.add(new String[] {"1", "2", "3"});
+        invalidArugments.add(new String[] {"aa", "bb"});
+        invalidArugments.add(new String[] {"aa", "2"});
+        invalidArugments.add(new String[] {"1", "bb"});
+
+        invalidArugments.forEach(arguments -> testShell.erase_range(arguments));
+
+        verify(testShell, times(0)).erase(any());
+    }
+
+    @ParameterizedTest
+    @MethodSource("getValidSingleEraseRangeArguments")
+    void eraseRange_withinEraseCapacity(String[] arguments) {
+        testShell.erase_range(arguments);
+
+        verify(testShell, times(1)).erase(any());
+    }
+
+    static Stream<Arguments> getValidSingleEraseRangeArguments() {
+        return Stream.of(
+                Arguments.arguments((Object) new String[] {"0", "9"}),
+                Arguments.arguments((Object) new String[] {"11", "12"}),
+                Arguments.arguments((Object) new String[] {"0", "10"}),
+                Arguments.arguments((Object) new String[] {"25", "34"})
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("getValidMultipleEraseRangeArguments")
+    void eraseRange_withinEraseCapacity(String[] arguments, int expectedTimes) {
+        testShell.erase_range(arguments);
+
+        verify(testShell, times(expectedTimes)).erase(any());
+    }
+
+    static Stream<Arguments> getValidMultipleEraseRangeArguments() {
+        return Stream.of(
+                Arguments.arguments(new String[] {"0", "99"}, 10),
+                Arguments.arguments(new String[] {"11", "50"}, 4),
+                Arguments.arguments(new String[] {"11", "52"}, 5),
+                Arguments.arguments(new String[] {"43", "27"}, 0),
+                Arguments.arguments(new String[] {"78", "94"}, 2),
+                Arguments.arguments(new String[] {"78", "190"}, 3),
+                Arguments.arguments(new String[] {"-100", "100"}, 10)
+        );
     }
 
     @ParameterizedTest
