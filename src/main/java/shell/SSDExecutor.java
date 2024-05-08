@@ -19,6 +19,10 @@ public class SSDExecutor {
         runCommand("R", lba);
     }
 
+    public void eraseData(String lba, String size) {
+        runCommand("E", lba, size);
+    }
+
     private void runCommand(String... args) {
         List<String> commands = new ArrayList<>(Arrays.asList("java", "-jar", jar));
         commands.addAll(Arrays.asList(args));
