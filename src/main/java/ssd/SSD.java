@@ -3,8 +3,8 @@ package ssd;
 public class SSD {
     public static final int MIN_LBA = 0;
     public static final int MAX_LBA = 99;
-    public static final int MIN_ERASE_SZIE = 1;
-    public static final int MAX_ERASE_SZIE = 10;
+    public static final int MIN_ERASE_SIZE = 1;
+    public static final int MAX_ERASE_SIZE = 10;
 
     static DeviceDriver deviceDriver;
 
@@ -109,11 +109,11 @@ public class SSD {
     }
 
     private static boolean isExceedEraseRange(int lba, int size) {
-        return lba + size - 1 > MAX_ERASE_SZIE;
+        return lba + size - 1 > MAX_ERASE_SIZE;
     }
 
     private static boolean isInvalidEraseSize(int size) {
-        return size < MIN_ERASE_SZIE || size > MAX_ERASE_SZIE;
+        return size < MIN_ERASE_SIZE || size > MAX_ERASE_SIZE;
     }
 
     public static boolean isImpossibleToParseToInt(String lbaStr) {

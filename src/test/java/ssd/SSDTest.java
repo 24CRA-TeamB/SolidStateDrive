@@ -187,7 +187,7 @@ class SSDTest {
     }
 
     @Test
-    @Disabled
+    @Disabled(value = "항상 파일이 존재해 무조건 적으로 발생하는 오류라 Disabled 작성")
     @DisplayName("File이 존재하지 않을 때, false 값을 반환한다")
     void doesNandFileExist() {
         assertEquals(false, new File(NAND_TXT_PATH).exists());
