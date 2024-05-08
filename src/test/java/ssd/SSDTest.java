@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -301,6 +302,40 @@ class SSDTest {
         boolean isInvalid = ssd.isInvalidCommand(args);
 
         assertTrue(isInvalid);
+    }
+
+    @Test
+    void invalidArgumentTC09(){
+        String[] args = new String[3];
+        args[0] = "E";
+        args[1] = "91";
+        args[2] = "10";
+
+        int eraseLba = Integer.parseInt(args[1]);
+        int eraseSize = Integer.parseInt(args[2]);
+
+        if(eraseLba + eraseSize - 1 > 99){
+            eraseSize = MAX_LBA + 1 - eraseLba;
+        }
+
+        assertThat(eraseSize).isEqualTo(9);
+    }
+
+    @Test
+    void invalidArgumentTC10(){
+        String[] args = new String[3];
+        args[0] = "E";
+        args[1] = "95";
+        args[2] = "10";
+
+        int eraseLba = Integer.parseInt(args[1]);
+        int eraseSize = Integer.parseInt(args[2]);
+
+        if(eraseLba + eraseSize - 1 > 99){
+            eraseSize = MAX_LBA + 1 - eraseLba;
+        }
+
+        assertThat(eraseSize).isEqualTo(5);
     }
 
     private void setWriteCommand(String writeCode, String lba, String data){

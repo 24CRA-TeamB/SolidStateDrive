@@ -3,6 +3,8 @@ package ssd;
 public class SSD {
     public static final int MIN_LBA = 0;
     public static final int MAX_LBA = 99;
+    public static final int MIN_ERASE_SZIE = 1;
+    public static final int MAX_ERASE_SZIE = 10;
 
     static DeviceDriver deviceDriver;
 
@@ -33,8 +35,12 @@ public class SSD {
                 deviceDriver.readData(targetLba);
                 break;
             case "E":
-                String eraseSize = cmdArgs[2];
-                deviceDriver.eraseData(targetLba, eraseSize);
+                int eraseLba = Integer.parseInt(cmdArgs[1]);
+                int eraseSize = Integer.parseInt(cmdArgs[2]);
+                if(isExceedEraseRange(eraseLba, eraseSize)){
+                    eraseSize = MAX_LBA + 1 - eraseLba;
+                }
+                deviceDriver.eraseData(targetLba, Integer.toString(eraseSize));
                 break;
         }
     }
@@ -86,16 +92,28 @@ public class SSD {
             if(cmdArgs.length != 3) return true;
 
             // parse int test
-            if(isImpossibleToParseToInt(cmdArgs[1]))
+            if(isImpossibleToParseToInt(cmdArgs[1]) || isImpossibleToParseToInt(cmdArgs[2]))
                 return true;
 
             // invalid lba test
             if(isInvalidLBA(Integer.parseInt(cmdArgs[1])))
                 return true;
 
+            // invalid size
+            if(isInvalidEraseSize(Integer.parseInt(cmdArgs[2])))
+                return true;
+
             return false;
         }
         else return true;
+    }
+
+    private static boolean isExceedEraseRange(int lba, int size) {
+        return lba + size - 1 > MAX_ERASE_SZIE;
+    }
+
+    private static boolean isInvalidEraseSize(int size) {
+        return size < MIN_ERASE_SZIE || size > MAX_ERASE_SZIE;
     }
 
     public static boolean isImpossibleToParseToInt(String lbaStr) {
