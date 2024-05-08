@@ -12,7 +12,7 @@ public class Logger {
         this.logPath = logPath;
     }
 
-    public Logger getInstance(String filePath) {
+    public static Logger getInstance(String filePath) {
         if (loggerMap.containsKey(filePath) == false) {
             Logger newLogger = new Logger(filePath);
             loggerMap.put(filePath, newLogger);
