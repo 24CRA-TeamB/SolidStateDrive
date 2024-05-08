@@ -1,6 +1,7 @@
 package logger;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,8 +29,12 @@ public class Logger {
 
     }
 
-    public File getLogFile() {
-        return new File("");
+    public File getLogFile() throws IOException {
+        File logFile = new File(this.logPath);
+        if (!logFile.exists()) {
+            logFile.createNewFile();
+        }
+        return logFile;
     }
 
     public File rollingLogFile(File logFile) {
