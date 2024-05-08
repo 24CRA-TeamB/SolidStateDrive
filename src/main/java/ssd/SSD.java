@@ -65,13 +65,12 @@ public class SSD {
     }
 
     public static boolean isImpossibleToParseToInt(String lbaStr) {
-        boolean sign = (lbaStr.charAt(0) == '-' || lbaStr.charAt(0) == '+');
-        for(int i= sign ? 1 : 0; i<lbaStr.length(); i++){
-            char c = lbaStr.charAt(i);
-            if(!('0' <= c && c <= '9'))
-                return true;
+        try {
+            Integer.parseInt(lbaStr);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
-        return false;
     }
 
     public static boolean isInvalidLBA(int lbaAddress) {

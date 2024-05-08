@@ -152,12 +152,12 @@ public class SamsungSSD implements SSDInterface{
     private boolean isValidData(String data) {
         if(!(data.charAt(0)=='0' && data.charAt(1) == 'x'))
             return false;
-        if(doesContainInvalidHexaDecimalChar(data))
+        if(hasInvalidHexaDecimalChar(data))
             return false;
         return true;
     }
 
-    private boolean doesContainInvalidHexaDecimalChar(String data) {
+    private boolean hasInvalidHexaDecimalChar(String data) {
         for(int i = 2; i < data.length(); i++){
             char c = data.charAt(i);
             if(!(('0' <= c && c <= '9') || ('A' <= c && c <= 'F')))
