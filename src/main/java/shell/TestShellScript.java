@@ -5,20 +5,6 @@ import org.assertj.core.util.VisibleForTesting;
 import java.util.Scanner;
 
 public class TestShellScript {
-    private static final String WRITE = "write";
-    private static final String FULL_WRITE = "fullwrite";
-    private static final String READ = "read";
-    private static final String FULL_READ = "fullread";
-    private static final String HELP = "help";
-    private static final String EXIT = "exit";
-
-    private static final int NUMBER_OF_ARGUMENTS_FOR_READ = 1;
-    private static final int NUMBER_OF_ARGUMENTS_FOR_FULLREAD = 0;
-    private static final int NUMBER_OF_ARGUMENTS_FOR_WRITE = 2;
-    private static final int NUMBER_OF_ARGUMENTS_FOR_FULLWRITE = 1;
-    private static final int NUMBER_OF_ARGUMENTS_FOR_HELP = 0;
-    private static final int NUMBER_OF_ARGUMENTS_FOR_EXIT = 0;
-
     public static void main(String[] args) {
         if (Strings.isNullOrEmpty(args[0])) {
             System.out.println("ssd.jar is required.");
@@ -30,52 +16,11 @@ public class TestShellScript {
 
         while (true) {
             String[] userInputArray = getUserInput();
+
             String command = getCommandFromUserInput(userInputArray);
             String[] arguments = getArgumentsFromUserInput(userInputArray);
-            try {
-                runTestShellWithCommand(testShell, command, arguments);
-            } catch (RuntimeException e) {
-                System.out.println("An error occurred while running the command");
-                System.out.println(e.getMessage());
-            }
-        }
-    }
 
-    @VisibleForTesting
-    static void runTestShellWithCommand(TestShell testShell, String command, String[] arguments) {
-        switch (command) {
-            case READ:
-                if (NUMBER_OF_ARGUMENTS_FOR_READ == arguments.length) {
-                    testShell.read(arguments[0]);
-                }
-                break;
-            case FULL_READ:
-                if (NUMBER_OF_ARGUMENTS_FOR_FULLREAD == arguments.length) {
-                    testShell.fullRead();
-                }
-                break;
-            case WRITE:
-                if (NUMBER_OF_ARGUMENTS_FOR_WRITE == arguments.length) {
-                    testShell.write(arguments[0], arguments[1]);
-                }
-                break;
-            case FULL_WRITE:
-                if (NUMBER_OF_ARGUMENTS_FOR_FULLWRITE == arguments.length) {
-                    testShell.fullwrite(arguments[0]);
-                }
-                break;
-            case HELP:
-                if (NUMBER_OF_ARGUMENTS_FOR_HELP == arguments.length) {
-                    testShell.help();
-                }
-                break;
-            case EXIT:
-                if (NUMBER_OF_ARGUMENTS_FOR_EXIT == arguments.length) {
-                    testShell.exit();
-                }
-                break;
-            default:
-                System.out.println("Invalid commands.");
+            testShell.run(command, arguments);
         }
     }
 

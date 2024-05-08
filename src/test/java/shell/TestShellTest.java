@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Stubber;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -53,6 +54,7 @@ class TestShellTest {
     @BeforeEach
     void setUp() {
         testShell = new TestShell(mockSSDExecutor);
+        lenient().doNothing().when(mockSSDExecutor).writeData(anyString(), anyString());
 
         outputStream = new ByteArrayOutputStream();
         originalOut = System.out;
@@ -69,7 +71,7 @@ class TestShellTest {
     void writeNormally(String lba, String data) {
         doNothing().when(mockSSDExecutor).writeData(lba, data);
 
-        testShell.write(lba, data);
+        testShell.write(new String[] {lba, data});
 
         verify(mockSSDExecutor, times(1)).writeData(lba, data);
     }
@@ -79,26 +81,25 @@ class TestShellTest {
     void fullwriteNormally(String data) {
         doNothing().when(mockSSDExecutor).writeData(anyString(), matches(data));
 
-        testShell.fullwrite(data);
+        testShell.fullwrite(new String[]{data});
 
         verify(mockSSDExecutor, times(TestShell.NUMBER_OF_LBA)).writeData(anyString(), matches(data));
     }
 
     @Test
     void read() {
-        String lba = "10";
-        doNothing().when(mockSSDExecutor).readData(lba);
+        String[] arguments = new String[] {"10"};
 
-        testShell.read(lba);
+        testShell.read(arguments);
 
-        verify(mockSSDExecutor, times(1)).readData(lba);
+        verify(mockSSDExecutor, times(1)).readData(arguments[0]);
     }
 
     @Test
     void fullRead() {
-        doNothing().when(mockSSDExecutor).readData(anyString());
+        String[] arguments = new String[] {};
 
-        testShell.fullRead();
+        testShell.fullRead(arguments);
 
         verify(mockSSDExecutor, times(100)).readData(anyString());
     }
@@ -111,15 +112,13 @@ class TestShellTest {
 
         Files.write(filePath, input.getBytes());
 
-        testShell.print(filePath.toString());
-
-        String actual = outputStream.toString().trim();
+        String actual = testShell.readResult(filePath.toString());
         assertThat(actual).isEqualTo(input);
     }
 
     @Test
     void printFail() {
-        testShell.print(NOT_EXISTED_FILE);
+        testShell.readResult(NOT_EXISTED_FILE);
 
         String actual = outputStream.toString().trim();
         String expected = "Failed to read result. " + NOT_EXISTED_FILE;
@@ -133,7 +132,9 @@ class TestShellTest {
 
     @Test
     void help() {
-        testShell.help();
+        String[] arguments = new String[]{};
+
+        testShell.help(arguments);
 
         assertEquals(HELP_DESCRIPTION, outputStream.toString());
     }
@@ -152,5 +153,63 @@ class TestShellTest {
                 Arguments.arguments("0xAAAABBBB"),
                 Arguments.arguments("0xFFFFFFFF")
         );
+    }
+
+    @Test
+    void testapp1() {
+        doNothing().when(testShell).fullwrite(any());
+        stubReadResult("0x12345678", 0, 100);
+
+        testShell.testapp1();
+
+        verify(testShell, times(1)).fullwrite(any());
+        verify(testShell, times(1)).fullread(any());
+
+        assertEquals("TestApp1 success\r\n", outputStream.toString());
+    }
+
+    @Test
+    void testapp1_fail() {
+        doNothing().when(testShell).fullwrite(any());
+        stubReadResult("0x87654321", 0, 100);
+
+        testShell.testapp1();
+
+        verify(testShell, times(1)).fullwrite(any());
+        verify(testShell, times(1)).fullread(any());
+
+        assertEquals("TestApp1 fail\r\n", outputStream.toString());
+    }
+
+    @Test
+    void testapp2() {
+        stubReadResult("0x12345678", 0, 5);
+
+        testShell.testapp2();
+
+        verify(mockSSDExecutor, times(150)).writeData(anyString(), matches("0xAAAABBBB"));
+        verify(mockSSDExecutor, times(5)).writeData(anyString(), matches("0x12345678"));
+
+        assertEquals("TestApp2 success\r\n", outputStream.toString());
+    }
+
+    @Test
+    void testapp2_fail() {
+        stubReadResult("0x87654321", 0, 5);
+
+        testShell.testapp2();
+
+        verify(mockSSDExecutor, times(150)).writeData(anyString(), matches("0xAAAABBBB"));
+        verify(mockSSDExecutor, times(5)).writeData(anyString(), matches("0x12345678"));
+
+        assertEquals("TestApp2 fail\r\n", outputStream.toString());
+    }
+
+    private void stubReadResult(String data, int from, int to) {
+        Stubber stubber = doReturn(from + " " + data);
+        for (int i = from + 1; i < to; i++) {
+            stubber = stubber.doReturn(i + " " + data);
+        }
+        stubber.when(testShell).readResult(anyString());
     }
 }

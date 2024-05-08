@@ -1,6 +1,6 @@
 package shell;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -10,7 +10,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,17 +21,25 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TestShellScriptTest {
+    public static final String TESTAPP_1 = "testapp1";
     @Mock
     TestShell mockTestShell;
 
+    private PrintStream originalOut;
+    private ByteArrayOutputStream outputStream;
+
     @BeforeEach
     void setUp() {
-        lenient().doNothing().when(mockTestShell).read(anyString());
-        lenient().doNothing().when(mockTestShell).fullRead();
-        lenient().doNothing().when(mockTestShell).write(anyString(), anyString());
-        lenient().doNothing().when(mockTestShell).fullwrite(anyString());
-        lenient().doNothing().when(mockTestShell).help();
-        lenient().doNothing().when(mockTestShell).exit();
+        lenient().doNothing().when(mockTestShell).run(anyString(), any());
+
+        outputStream = new ByteArrayOutputStream();
+        originalOut = System.out;
+        System.setOut(new PrintStream(outputStream));
+    }
+
+    @AfterEach
+    void tearDown() {
+        System.setOut(originalOut);
     }
 
     @ParameterizedTest
@@ -66,67 +76,6 @@ class TestShellScriptTest {
         for (int i = 0; i < arguments.length; i++) {
             assertEquals(arguments[i], actualArguments[i]);
         }
-    }
-
-    @Test
-    void runTestShellWithCommand_read() {
-        String command = "read";
-        String[] arguments = new String[] {"3"};
-
-        TestShellScript.runTestShellWithCommand(mockTestShell, command, arguments);
-
-        verify(mockTestShell, times(1)).read(matches("3"));
-    }
-
-    @Test
-    void runTestShellWithCommand_fullread() {
-        String command = "fullread";
-        String[] arguments = new String[] {};
-
-        TestShellScript.runTestShellWithCommand(mockTestShell, command, arguments);
-
-        verify(mockTestShell, times(1)).fullRead();
-    }
-
-
-    @Test
-    void runTestShellWithCommand_write() {
-        String command = "write";
-        String[] arguments = new String[] {"37", "0xC38293FF"};
-
-        TestShellScript.runTestShellWithCommand(mockTestShell, command, arguments);
-
-        verify(mockTestShell, times(1)).write(matches("37"), matches("0xC38293FF"));
-    }
-
-    @Test
-    void runTestShellWithCommand_fullwrite() {
-        String command = "fullwrite";
-        String[] arguments = new String[] {"0xC38293FF"};
-
-        TestShellScript.runTestShellWithCommand(mockTestShell, command, arguments);
-
-        verify(mockTestShell, times(1)).fullwrite(matches("0xC38293FF"));
-    }
-
-    @Test
-    void runTestShellWithCommand_help() {
-        String command = "help";
-        String[] arguments = new String[] {};
-
-        TestShellScript.runTestShellWithCommand(mockTestShell, command, arguments);
-
-        verify(mockTestShell, times(1)).help();
-    }
-
-    @Test
-    void runTestShellWithCommand_exit() {
-        String command = "exit";
-        String[] arguments = new String[] {};
-
-        TestShellScript.runTestShellWithCommand(mockTestShell, command, arguments);
-
-        verify(mockTestShell, times(1)).exit();
     }
 
     static Stream<Arguments> getInputCommandAndExpectedList() {
