@@ -11,15 +11,15 @@ public class DeviceDriver {
         this.ssdInterface = ssdInterface;
     }
 
-    public void readData(String lba){
-        ssdInterface.read(lba);
+    public void readData(Command command){
+        ssdInterface.read(command);
     }
 
-    public void writeData(String lba, String data){
-        ssdInterface.write(lba, data);
+    public void writeData(Command command){
+        ssdInterface.write(command);
     }
 
-    public void eraseData(String lba, String size){
-        ssdInterface.erase(lba, size);
+    public void eraseData(Command command){
+        ssdInterface.erase(command);
     }
 }

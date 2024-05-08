@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
@@ -20,20 +19,24 @@ class SSDTest {
 
     public static final String NAND_TXT_PATH = "./nand.txt";
     public static final int WRITE_ARGUMENT_NUM = 3;
+    public static final int ERASE_ARGUMENT_NUM = 3;
     public static final int READ_ARGUMENT_NUM = 2;
     public static final int MAX_LBA = 99;
     public static final int MIN_LBA = 0;
-    String[] writeCommand = new String[WRITE_ARGUMENT_NUM];
-    String[] readCommand = new String[READ_ARGUMENT_NUM];
+    String[] writeCommandArgument = new String[WRITE_ARGUMENT_NUM];
+    String[] readCommandArgument = new String[READ_ARGUMENT_NUM];
+    String[] eraseCommandArgument = new String[ERASE_ARGUMENT_NUM];
 
     @Mock
     SSDInterface ssdInterface;
 
     SSD ssd;
+    CommandFactory commandFactory;
 
     @BeforeEach
     void setUp() {
         ssd = new SSD(ssdInterface);
+        commandFactory = CommandFactory.getInstance();
     }
 
     @Test
@@ -43,7 +46,7 @@ class SSDTest {
         setReadCommand("S", "15");
 
         // when
-        boolean isInvalid = ssd.isInvalidCommand(readCommand);
+        boolean isInvalid = commandFactory.isInvalidCommand(readCommandArgument);
 
         // then
         assertTrue(isInvalid);
@@ -56,7 +59,7 @@ class SSDTest {
         setReadCommand("R", "X");
 
         // when
-        boolean isInvalid = ssd.isInvalidCommand(readCommand);
+        boolean isInvalid = commandFactory.isInvalidCommand(readCommandArgument);
 
         // then
         assertTrue(isInvalid);
@@ -69,7 +72,7 @@ class SSDTest {
         setReadCommand("R", "-1");
 
         // when
-        boolean isInvalid = ssd.isInvalidCommand(readCommand);
+        boolean isInvalid = commandFactory.isInvalidCommand(readCommandArgument);
 
         // then
         assertTrue(isInvalid);
@@ -82,7 +85,7 @@ class SSDTest {
         setReadCommand("R", "100");
 
         // when
-        boolean isInvalid = ssd.isInvalidCommand(readCommand);
+        boolean isInvalid = commandFactory.isInvalidCommand(readCommandArgument);
 
         // then
         assertTrue(isInvalid);
@@ -95,7 +98,7 @@ class SSDTest {
         setReadCommand("R", "99");
 
         // when
-        boolean isInvalid = ssd.isInvalidCommand(readCommand);
+        boolean isInvalid = commandFactory.isInvalidCommand(readCommandArgument);
 
         // then
         assertFalse(isInvalid);
@@ -108,7 +111,7 @@ class SSDTest {
         setWriteCommand("W", "99", "0a01103302");
 
         // when
-        boolean isInvalid = ssd.isInvalidCommand(writeCommand);
+        boolean isInvalid = commandFactory.isInvalidCommand(writeCommandArgument);
 
         // then
         assertTrue(isInvalid);
@@ -121,7 +124,7 @@ class SSDTest {
         setWriteCommand("W", "99", "0x011033021");
 
         // when
-        boolean isInvalid = ssd.isInvalidCommand(writeCommand);
+        boolean isInvalid = commandFactory.isInvalidCommand(writeCommandArgument);
 
         // then
         assertTrue(isInvalid);
@@ -134,7 +137,7 @@ class SSDTest {
         setWriteCommand("W", "99", "0x0119010K");
 
         // when
-        boolean isInvalid = ssd.isInvalidCommand(writeCommand);
+        boolean isInvalid = commandFactory.isInvalidCommand(writeCommandArgument);
 
         // then
         assertTrue(isInvalid);
@@ -147,7 +150,7 @@ class SSDTest {
         setWriteCommand("W", "99", "0x0119010A");
 
         // when
-        boolean isInvalid = ssd.isInvalidCommand(writeCommand);
+        boolean isInvalid = commandFactory.isInvalidCommand(writeCommandArgument);
 
         // then
         assertFalse(isInvalid);
@@ -159,11 +162,12 @@ class SSDTest {
         // given
         setReadCommand("R", "1");
 
+        Command command = commandFactory.makeCommand(readCommandArgument);
         // when
-        ssd.doCommand(readCommand);
+        ssd.doCommand(command);
 
         // then
-        verify(ssdInterface, times(1)).read("1");
+        verify(ssdInterface, times(1)).read(command);
     }
 
     @Test
@@ -176,14 +180,14 @@ class SSDTest {
         setWriteCommand("W", "X", "0x12345678");
 
         // then
-        assertEquals(true, ssd.isImpossibleToParseToInt(writeCommand[1]));
+        assertEquals(true, commandFactory.isImpossibleToParseToInt(writeCommandArgument[1]));
     }
 
     @Test
     @DisplayName("Logic Block Address 값의 최소값과 최대값을 검증한다")
     void isInvalidLBA() {
-        assertEquals(true, ssd.isInvalidLBA(MIN_LBA-1));
-        assertEquals(true, ssd.isInvalidLBA(MAX_LBA+1));
+        assertEquals(true, commandFactory.isInvalidLBA(MIN_LBA-1));
+        assertEquals(true, commandFactory.isInvalidLBA(MAX_LBA+1));
     }
 
     @Test
@@ -199,11 +203,13 @@ class SSDTest {
         // given
         setWriteCommand("W", "1", "0x12345678");
 
+        Command command = commandFactory.makeCommand(writeCommandArgument);
+
         // when
-        ssd.doCommand(writeCommand);
+        ssd.doCommand(command);
 
         // then
-        verify(ssdInterface, times(1)).write("1", "0x12345678");
+        verify(ssdInterface, times(1)).write(command);
     }
 
     @Test
@@ -213,7 +219,7 @@ class SSDTest {
         setReadCommand("R", "01");
 
         // when
-        boolean success = ssd.isImpossibleToParseToInt(readCommand[1]);
+        boolean success = commandFactory.isImpossibleToParseToInt(readCommandArgument[1]);
 
         // then
         assertFalse(success);
@@ -221,7 +227,7 @@ class SSDTest {
 
     @Test
     void invalidArgumentTC01(){
-        boolean isInvalid = ssd.isInvalidCommand(null);
+        boolean isInvalid = commandFactory.isInvalidCommand(null);
 
         assertTrue(isInvalid);
     }
@@ -231,7 +237,7 @@ class SSDTest {
         String[] args = new String[1];
         args[0] = "W";
 
-        boolean isInvalid = ssd.isInvalidCommand(args);
+        boolean isInvalid = commandFactory.isInvalidCommand(args);
 
         assertTrue(isInvalid);
     }
@@ -241,7 +247,7 @@ class SSDTest {
         String[] args = new String[1];
         args[0] = "R";
 
-        boolean isInvalid = ssd.isInvalidCommand(args);
+        boolean isInvalid = commandFactory.isInvalidCommand(args);
 
         assertTrue(isInvalid);
     }
@@ -252,7 +258,7 @@ class SSDTest {
         args[0] = "W";
         args[1] = "33";
 
-        boolean isInvalid = ssd.isInvalidCommand(args);
+        boolean isInvalid = commandFactory.isInvalidCommand(args);
 
         assertTrue(isInvalid);
     }
@@ -264,7 +270,7 @@ class SSDTest {
         args[1] = "29";
         args[2] = "0x223123";
 
-        boolean isInvalid = ssd.isInvalidCommand(args);
+        boolean isInvalid = commandFactory.isInvalidCommand(args);
 
         assertTrue(isInvalid);
     }
@@ -276,7 +282,7 @@ class SSDTest {
         args[1] = "99";
         args[2] = "0x22312323";
 
-        boolean isInvalid = ssd.isInvalidCommand(args);
+        boolean isInvalid = commandFactory.isInvalidCommand(args);
 
         assertTrue(isInvalid);
     }
@@ -287,7 +293,7 @@ class SSDTest {
         args[0] = "R";
         args[1] = "W";
 
-        boolean isInvalid = ssd.isInvalidCommand(args);
+        boolean isInvalid = commandFactory.isInvalidCommand(args);
 
         assertTrue(isInvalid);
     }
@@ -299,7 +305,7 @@ class SSDTest {
         args[1] = "1";
         args[2] = "11";
 
-        boolean isInvalid = ssd.isInvalidCommand(args);
+        boolean isInvalid = commandFactory.isInvalidCommand(args);
 
         assertTrue(isInvalid);
     }
@@ -338,14 +344,24 @@ class SSDTest {
         assertThat(eraseSize).isEqualTo(5);
     }
 
+    @Test
+    void eraseCommandTest(){
+        eraseCommandArgument[0] = "E";
+        eraseCommandArgument[1] = "2";
+        eraseCommandArgument[2] = "1";
+        Command command = commandFactory.makeCommand(eraseCommandArgument);
+        ssd.doCommand(command);
+        verify(ssdInterface, times(1)).erase(command);
+    }
+
     private void setWriteCommand(String writeCode, String lba, String data){
-        writeCommand[0] = writeCode;
-        writeCommand[1] = lba;
-        writeCommand[2] = data;
+        writeCommandArgument[0] = writeCode;
+        writeCommandArgument[1] = lba;
+        writeCommandArgument[2] = data;
     }
 
     private void setReadCommand(String readCode, String lba){
-        readCommand[0] = readCode;
-        readCommand[1] = lba;
+        readCommandArgument[0] = readCode;
+        readCommandArgument[1] = lba;
     }
 }
