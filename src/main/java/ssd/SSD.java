@@ -32,6 +32,10 @@ public class SSD {
             case "R":
                 deviceDriver.readData(targetLba);
                 break;
+            case "E":
+                String eraseSize = cmdArgs[2];
+                deviceDriver.eraseData(targetLba, eraseSize);
+                break;
         }
     }
 
