@@ -26,6 +26,8 @@ public class TestShell {
     private static final int NUMBER_OF_ARGUMENTS_FOR_FULLWRITE = 1;
     private static final int NUMBER_OF_ARGUMENTS_FOR_HELP = 0;
     private static final int NUMBER_OF_ARGUMENTS_FOR_EXIT = 0;
+    private static final int NUMBER_OF_ARGUMENTS_FOR_TESTAPP1 = 0;
+    private static final int NUMBER_OF_ARGUMENTS_FOR_TESTAPP2 = 0;
 
     public static final int NUMBER_OF_LBA = 100;
     static final String RESULT_FILE = "result.txt";
@@ -62,10 +64,10 @@ public class TestShell {
                 exit(arguments);
                 break;
             case TESTAPP1:
-                testapp1();
+                testapp1(arguments);
                 break;
             case TESTAPP2:
-                testapp2();
+                testapp2(arguments);
                 break;
             default:
                 System.out.println("Invalid commands.");
@@ -100,6 +102,10 @@ public class TestShell {
     }
 
     public void readAndPrint(String[] arguments) {
+        if (NUMBER_OF_ARGUMENTS_FOR_READ != arguments.length) {
+            return;
+        }
+
         System.out.println(read(arguments));
     }
 
@@ -118,6 +124,10 @@ public class TestShell {
     }
 
     public void fullreadAndPrint(String[] arguments) {
+        if (NUMBER_OF_ARGUMENTS_FOR_FULLREAD != arguments.length) {
+            return;
+        }
+
         fullread(arguments).forEach(System.out::println);
     }
 
@@ -144,13 +154,21 @@ public class TestShell {
         System.out.println("exit\t\tend TestShell. ex) exit");
     }
 
-    public void testapp1() {
+    public void testapp1(String[] arguments) {
+        if (NUMBER_OF_ARGUMENTS_FOR_TESTAPP1 != arguments.length) {
+            return;
+        }
+        
         fullwrite(new String[]{"0x12345678"});
         ArrayList<String> result = fullread(new String[]{});
         verifyTestApp1(result);
     }
 
-    public void testapp2() {
+    public void testapp2(String[] arguments) {
+        if (NUMBER_OF_ARGUMENTS_FOR_TESTAPP2 != arguments.length) {
+            return;
+        }
+
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 30; j++) {
                 write(new String[]{Integer.toString(i), "0xAAAABBBB"});

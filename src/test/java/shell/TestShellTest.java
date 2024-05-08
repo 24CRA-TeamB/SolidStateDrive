@@ -164,7 +164,7 @@ class TestShellTest {
         doNothing().when(testShell).fullwrite(any());
         stubReadResult("0x12345678", 0, 100);
 
-        testShell.testapp1();
+        testShell.testapp1(new String[]{});
 
         verify(testShell, times(1)).fullwrite(any());
         verify(testShell, times(1)).fullread(any());
@@ -178,7 +178,7 @@ class TestShellTest {
 
         stubReadResult("0x87654321", 0, 100);
 
-        testShell.testapp1();
+        testShell.testapp1(new String[]{});
 
         verify(testShell, times(1)).fullwrite(any());
         verify(testShell, times(1)).fullread(any());
@@ -190,7 +190,7 @@ class TestShellTest {
     void testapp2() {
         stubReadResult("0x12345678", 0, 5);
 
-        testShell.testapp2();
+        testShell.testapp2(new String[]{});
 
         verify(mockSSDExecutor, times(150)).writeData(anyString(), matches("0xAAAABBBB"));
         verify(mockSSDExecutor, times(5)).writeData(anyString(), matches("0x12345678"));
@@ -202,7 +202,7 @@ class TestShellTest {
     void testapp2_fail() {
         stubReadResult("0x87654321", 0, 5);
 
-        testShell.testapp2();
+        testShell.testapp2(new String[]{});
 
         verify(mockSSDExecutor, times(150)).writeData(anyString(), matches("0xAAAABBBB"));
         verify(mockSSDExecutor, times(5)).writeData(anyString(), matches("0x12345678"));
