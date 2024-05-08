@@ -30,6 +30,7 @@ public class TestShell {
     private static final int NUMBER_OF_ARGUMENTS_FOR_FULLREAD = 0;
     private static final int NUMBER_OF_ARGUMENTS_FOR_WRITE = 2;
     private static final int NUMBER_OF_ARGUMENTS_FOR_FULLWRITE = 1;
+    private static final int NUMBER_OF_ARGUMENTS_FOR_ERASE = 2;
     private static final int NUMBER_OF_ARGUMENTS_FOR_ERASE_RANGE = 2;
     private static final int NUMBER_OF_ARGUMENTS_FOR_HELP = 0;
     private static final int NUMBER_OF_ARGUMENTS_FOR_EXIT = 0;
@@ -37,7 +38,7 @@ public class TestShell {
     private static final int NUMBER_OF_ARGUMENTS_FOR_TESTAPP2 = 0;
 
     public static final int NUMBER_OF_LBA = 100;
-    public static final int ERASE_CAPACITY = 10;
+    private static final int MAX_ERASE_SIZE = 10;
     static final String RESULT_FILE = "result.txt";
     private final HashMap<String, Method> methodFactory = new HashMap<>();
     private SSDExecutor ssdExecutor;
@@ -147,7 +148,29 @@ public class TestShell {
     }
 
     public void erase(String[] arguments) {
+        if (NUMBER_OF_ARGUMENTS_FOR_ERASE != arguments.length) {
+            return;
+        }
 
+        int lba = Integer.parseInt(arguments[0]);
+        int size = Integer.parseInt(arguments[1]);
+
+        if (size == 0) {
+            System.out.println("can not erase with size 0");
+            return;
+        }
+
+        while (size > 0) {
+            int erazeSize = Math.min(size, MAX_ERASE_SIZE);
+
+            if (lba + erazeSize > NUMBER_OF_LBA) {
+                erazeSize = NUMBER_OF_LBA - lba;
+            }
+
+            ssdExecutor.eraseData(String.valueOf(lba), String.valueOf(erazeSize));
+            size -= MAX_ERASE_SIZE;
+            lba += MAX_ERASE_SIZE;
+        }
     }
 
     public void erase_range(String[] arguments) {
@@ -165,7 +188,7 @@ public class TestShell {
 
         int lba = startLBA;
         while (remainSize > 0) {
-            int size = Math.min(remainSize, ERASE_CAPACITY);
+            int size = Math.min(remainSize, MAX_ERASE_SIZE);
             erase(new String[]{Integer.toString(lba), Integer.toString(size)});
             remainSize -= size;
             lba += size;
