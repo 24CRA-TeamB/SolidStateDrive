@@ -50,26 +50,30 @@ public class SamsungSSD implements SSDInterface{
     }
 
     @Override
-    public void read(String lba) {
-        String readValue = readNandFileForTargetLBA(lba);
+    public void read(Command command) {
+        String readValue = readNandFileForTargetLBA(command.getLba());
         writeResultFile(readValue);
     }
 
     @Override
-    public void erase(String lba, String size) {
-        for(int startLba = Integer.parseInt(lba); startLba<Integer.parseInt(size); startLba++){
-            write(String.valueOf(startLba), EMPTY_DATA_VALUE);
+    public void erase(Command command) {
+        for(int startLba = Integer.parseInt(command.getLba()); startLba<(Integer.parseInt(command.getValue())+Integer.parseInt(command.getLba())); startLba++){
+            writeNandTxtFile(String.valueOf(startLba), EMPTY_DATA_VALUE);
         }
     }
 
     @Override
-    public void write(String lba, String data) {
-        if(!isValidData(data))
+    public void write(Command command) {
+        if(!isValidData(command.getValue()))
             throw new RuntimeException();
 
-        if(Integer.parseInt(lba) < 0)
+        if(Integer.parseInt(command.getLba()) < 0)
             throw new RuntimeException();
 
+        writeNandTxtFile(command.getLba(), command.getValue());
+    }
+
+    private void writeNandTxtFile(String lba, String data) {
         try {
             FileReader fileReader = new FileReader(NAND_TXT_PATH);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
