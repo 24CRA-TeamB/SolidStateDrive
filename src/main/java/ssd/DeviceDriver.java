@@ -12,17 +12,14 @@ public class DeviceDriver {
     }
 
     public void readData(String lba){
-        if(isInvalidLBA(Integer.parseInt(lba))){
-            return;
-        }
         ssdInterface.read(lba);
-    }
-
-    private boolean isInvalidLBA(int lbaAddress) {
-        return lbaAddress < MIN_LBA || lbaAddress > MAX_LBA;
     }
 
     public void writeData(String lba, String data){
         ssdInterface.write(lba, data);
+    }
+
+    public void eraseData(String lba, String size){
+        ssdInterface.erase(lba, size);
     }
 }
