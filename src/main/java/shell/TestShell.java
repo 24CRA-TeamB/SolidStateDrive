@@ -14,6 +14,8 @@ public class TestShell {
     public static final String FULL_WRITE = "fullwrite";
     public static final String READ = "read";
     public static final String FULL_READ = "fullread";
+    public static final String ERASE = "erase";
+    public static final String ERASE_RANGE = "erase_range";
     public static final String HELP = "help";
     public static final String EXIT = "exit";
     public static final String TESTAPP1 = "testapp1";
@@ -59,6 +61,12 @@ public class TestShell {
                 break;
             case HELP:
                 help(arguments);
+                break;
+            case ERASE:
+                erase(arguments);
+                break;
+            case ERASE_RANGE:
+                erase_range(arguments);
                 break;
             case EXIT:
                 exit(arguments);
@@ -129,6 +137,14 @@ public class TestShell {
         }
 
         fullread(arguments).forEach(System.out::println);
+    }
+
+    public void erase(String[] arguments) {
+
+    }
+
+    public void erase_range(String[] arguments) {
+
     }
 
     public void exit(String[] arguments) {
