@@ -1,6 +1,6 @@
-package java.ssd;
+package ssd;
 
 public interface SSDInterface {
-    void read(int lba);
-    void write(int lba, int data);
+    void read(String lba) throws InvalidLBAExcpetion;
+    void write(String lba, String data);
 }
