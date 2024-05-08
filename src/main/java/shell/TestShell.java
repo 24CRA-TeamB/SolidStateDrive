@@ -1,6 +1,7 @@
 package shell;
 
-import ssd.DeviceDriver;
+
+import org.assertj.core.util.VisibleForTesting;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,7 +18,7 @@ public class TestShell {
     public static final String EXIT = "exit";
     public static final String TESTAPP1 = "testapp1";
     public static final String TESTAPP2 = "testapp2";
-    private static final String[] EMPTY_ARGUMENTS = new String[] {};
+    private static final String[] EMPTY_ARGUMENTS = new String[]{};
 
     private static final int NUMBER_OF_ARGUMENTS_FOR_READ = 1;
     private static final int NUMBER_OF_ARGUMENTS_FOR_FULLREAD = 0;
@@ -28,21 +29,16 @@ public class TestShell {
 
     public static final int NUMBER_OF_LBA = 100;
     static final String RESULT_FILE = "result.txt";
-    private DeviceDriver deviceDriver;
 
-    public TestShell() {
+    private SSDExecutor ssdExecutor;
+
+    @VisibleForTesting
+    TestShell() {
+        // for test
     }
 
-    public TestShell(DeviceDriver deviceDriver) {
-        setDeviceDriver(deviceDriver);
-    }
-
-    public void setDeviceDriver(DeviceDriver deviceDriver) {
-        this.deviceDriver = deviceDriver;
-    }
-
-    public DeviceDriver getDeviceDriver() {
-        return this.deviceDriver;
+    public TestShell(SSDExecutor ssdExecutor) {
+        this.ssdExecutor = ssdExecutor;
     }
 
     public void run(String command, String[] arguments) {
@@ -81,7 +77,7 @@ public class TestShell {
             return;
         }
 
-        deviceDriver.writeData(arguments[0], arguments[1]);
+        ssdExecutor.writeData(arguments[0], arguments[1]);
     }
 
     public void fullwrite(String[] arguments) {
@@ -90,7 +86,7 @@ public class TestShell {
         }
 
         for (int i = 0; i < NUMBER_OF_LBA; i++) {
-            write(new String[] {Integer.toString(i), arguments[0]});
+            write(new String[]{Integer.toString(i), arguments[0]});
         }
     }
 
@@ -99,7 +95,7 @@ public class TestShell {
             return "";
         }
 
-        deviceDriver.readData(arguments[0]);
+        ssdExecutor.readData(arguments[0]);
         return readResult(RESULT_FILE);
     }
 
@@ -114,7 +110,7 @@ public class TestShell {
         }
 
         for (int i = 0; i < NUMBER_OF_LBA; i++) {
-            deviceDriver.readData(Integer.toString(i));
+            ssdExecutor.readData(Integer.toString(i));
             result.add(readResult(RESULT_FILE));
         }
 
@@ -149,24 +145,24 @@ public class TestShell {
     }
 
     public void testapp1() {
-        fullwrite(new String[] {"0x12345678"});
-        ArrayList<String> result = fullread(new String[] {});
+        fullwrite(new String[]{"0x12345678"});
+        ArrayList<String> result = fullread(new String[]{});
         verifyTestApp1(result);
     }
 
     public void testapp2() {
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 30; j++) {
-                write(new String[] {Integer.toString(i), "0xAAAABBBB"});
+                write(new String[]{Integer.toString(i), "0xAAAABBBB"});
             }
         }
 
         for (int i = 0; i < 5; i++) {
-            write(new String[] {Integer.toString(i), "0x12345678"});
+            write(new String[]{Integer.toString(i), "0x12345678"});
         }
 
         ArrayList<String> result = new ArrayList<>();
-        for (int i = 0; i < 5; i++){
+        for (int i = 0; i < 5; i++) {
             result.add(read(new String[]{Integer.toString(i)}));
         }
 
@@ -213,5 +209,10 @@ public class TestShell {
             System.out.println("Failed to read result. " + e.getMessage());
             return "";
         }
+    }
+
+    @VisibleForTesting
+    void setSSDExecutor(SSDExecutor ssdExecutor) {
+        this.ssdExecutor = ssdExecutor;
     }
 }

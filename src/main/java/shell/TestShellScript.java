@@ -2,14 +2,17 @@ package shell;
 
 import org.assertj.core.util.Strings;
 import org.assertj.core.util.VisibleForTesting;
-import ssd.DeviceDriver;
-import ssd.SamsungSSD;
-
 import java.util.Scanner;
 
 public class TestShellScript {
     public static void main(String[] args) {
-        TestShell testShell = new TestShell(new DeviceDriver(new SamsungSSD()));
+        if (Strings.isNullOrEmpty(args[0])) {
+            System.out.println("ssd.jar is required.");
+            System.exit(0);
+        }
+
+        String ssdJar = args[0];
+        TestShell testShell = new TestShell(new SSDExecutor(ssdJar));
 
         while (true) {
             String[] userInputArray = getUserInput();
