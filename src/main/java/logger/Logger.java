@@ -1,7 +1,6 @@
 package logger;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,6 +10,7 @@ public class Logger {
     public static final String FORMAT_TIMESTAMP = "yy.MM.dd HH:mm";
     public static final int METHOD_PADDING_LENGTH = 30;
     private final String logPath;
+    private File logFile;
 
     private Logger(String logPath){
         this.logPath = logPath;
@@ -26,11 +26,29 @@ public class Logger {
     }
 
     public void writeLog(String content) {
+        try {
+            String invokeMethod = getInvokeMethodName(Thread.currentThread().getStackTrace());
+            String formattedContent = formatLogContent(invokeMethod, content);
+            getLogFile();
+            appendLogFile(formattedContent);
+            System.out.println(formattedContent);
+        } catch (IOException e) {
+            System.out.println("failed to write log");
+        }
+    }
 
+    private void appendLogFile(String formattedContent) throws IOException {
+        FileWriter fileWriter = new FileWriter(logPath, true);
+        fileWriter.write(formattedContent + "\n");
+        fileWriter.close();
+    }
+
+    public String getInvokeMethodName(StackTraceElement[] stackTraceElements) {
+        return stackTraceElements[2].getMethodName();
     }
 
     public File getLogFile() throws IOException {
-        File logFile = new File(this.logPath);
+        logFile = new File(this.logPath);
         if (!logFile.exists()) {
             logFile.createNewFile();
         }
