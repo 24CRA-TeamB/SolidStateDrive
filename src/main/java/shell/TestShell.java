@@ -1,6 +1,7 @@
 package shell;
 
 
+import org.assertj.core.util.Strings;
 import org.assertj.core.util.VisibleForTesting;
 
 import java.io.IOException;
@@ -106,7 +107,13 @@ public class TestShell {
             return;
         }
 
-        System.out.println(read(arguments));
+        String result = read(arguments);
+
+        if (!Strings.isNullOrEmpty(result)) {
+            System.out.println(result);
+        } else {
+            System.out.println("Read Error");
+        }
     }
 
     public ArrayList<String> fullread(String[] arguments) {
