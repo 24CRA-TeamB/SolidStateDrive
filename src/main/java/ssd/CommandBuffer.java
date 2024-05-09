@@ -3,37 +3,25 @@ package ssd;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CommandBuffer {
     public static final int MAX_BUFFER_SIZE = 10;
-    private String BUFFER_PATH = "./buffer.txt";
-    CommandFactory commandFactory;
-    List<Command> commands;
+    private static final String BUFFER_TXT_PATH = "./buffer.txt";
 
-    public CommandBuffer(){
+    private final List<Command> commands;
+    private final CommandFactory commandFactory;
+
+    public CommandBuffer(CommandFactory commandFactory){
         this.commands = new ArrayList<>();
-        commandFactory = CommandFactory.getInstance();
+        this.commandFactory = commandFactory;
+    }
 
-        BufferedReader bufferedReader = null;
-        StringBuilder stringBuilder = new StringBuilder();
-        try {
-            bufferedReader = new BufferedReader(new FileReader(BUFFER_PATH));
-            stringBuilder.append(bufferedReader.readLine());
-            bufferedReader.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage() + " buffer.txt 없습니다.");
-        }
-
-        JSONArray jasonArray = new JSONArray(stringBuilder.toString());
-        for(int i = 0; i < jasonArray.length(); i++){
-            Command command = getCommandFromJsonObject(jasonArray.getJSONObject(i));
-            this.commands.add(command);
-        }
+    public void execute(){
+        for(Command command : commands)
+            command.execute();
     }
 
     public void addCommand(Command command){
@@ -49,27 +37,86 @@ public class CommandBuffer {
         return this.commands.size() == MAX_BUFFER_SIZE;
     }
 
-    public Command getCommand(){
-        // empty 일 때는 null 리턴하도록 변경
+    private void optimize(){}
 
-        Command command = this.commands.get(0);
-        commands.remove(0);
-        return command;
+    public void clearHistory() {
+        this.commands.clear();
     }
 
-    private void optimize(){
-
+    public int getSize(){
+        return this.commands.size();
     }
 
-    private Command getCommandFromJsonObject(JSONObject jsonObject){
-        String cmd = jsonObject.getString("cmd");
-        String lba = jsonObject.getString("lba");
-        String value = jsonObject.getString("value");
+    public void load(){
+        File file = new File(BUFFER_TXT_PATH);
+        if(!file.exists()){
+            try {
+                boolean success = file.createNewFile();
+                if(!success){
+                    return;
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
-        String[] args = new String[3];
-        args[0] = cmd;
-        args[1] = lba;
-        args[2] = value;
-        return commandFactory.makeCommand(args);
+        BufferedReader bufferedReader = null;
+        StringBuilder stringBuilder = new StringBuilder();
+        try {
+            bufferedReader = new BufferedReader(new FileReader(BUFFER_TXT_PATH));
+            stringBuilder.append(bufferedReader.readLine());
+            bufferedReader.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage() + " buffer.txt 없습니다.");
+        }
+
+        String jsonArrayString = stringBuilder.toString();
+
+        if(jsonArrayString.isEmpty() || jsonArrayString.equals("null")){
+            jsonArrayString = "[]";
+        }
+
+        JSONArray jasonArray = new JSONArray(jsonArrayString);
+        for(int i = 0; i < jasonArray.length(); i++){
+            JSONObject jsonObject = jasonArray.getJSONObject(i);
+            Command command = commandFactory.makeCommand(jsonObject);
+            this.commands.add(command);
+        }
+    }
+
+    public void store() {
+        JSONArray jsonArray = new JSONArray();
+        for(Command command : this.commands){
+            if(command instanceof CommandRead){
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("cmd", CommandCode.R.getCmd());
+                jsonObject.put("lba", Integer.toString(((CommandRead) command).getLba()));
+                jsonArray.put(jsonObject);
+            }
+
+            if(command instanceof CommandWrite){
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("cmd", CommandCode.W.getCmd());
+                jsonObject.put("lba", Integer.toString(((CommandWrite) command).getLba()));
+                jsonObject.put("data", ((CommandWrite) command).getData());
+                jsonArray.put(jsonObject);
+            }
+
+            if(command instanceof CommandErase){
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("cmd", CommandCode.E.getCmd());
+                jsonObject.put("lba", Integer.toString(((CommandErase) command).getLba()));
+                jsonObject.put("size", Integer.toString(((CommandErase) command).getSize()));
+                jsonArray.put(jsonObject);
+            }
+        }
+
+        try {
+            FileWriter fileWriter = new FileWriter(BUFFER_TXT_PATH);
+            fileWriter.write(jsonArray.toString());
+            fileWriter.close();
+        } catch (IOException e){
+            System.out.println("Error 발생");
+        }
     }
 }
