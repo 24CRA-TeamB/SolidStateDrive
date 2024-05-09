@@ -229,10 +229,6 @@ class TestShellTest {
     }
 
     @Test
-    void exit() {
-    }
-
-    @Test
     void help() {
         String[] arguments = new String[]{};
 
