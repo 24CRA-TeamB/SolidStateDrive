@@ -11,10 +11,12 @@ import java.util.List;
 
 public class CommandBuffer {
     private String BUFFER_PATH = "./buffer.txt";
+    CommandFactory commandFactory;
     List<Command> commands;
 
     public CommandBuffer(){
         this.commands = new ArrayList<>();
+        commandFactory = CommandFactory.getInstance();
 
         BufferedReader bufferedReader = null;
         StringBuilder stringBuilder = new StringBuilder();
@@ -62,6 +64,11 @@ public class CommandBuffer {
         String cmd = jsonObject.getString("cmd");
         String lba = jsonObject.getString("lba");
         String value = jsonObject.getString("value");
-        return new Command(cmd, lba, value);
+
+        String[] args = new String[3];
+        args[0] = cmd;
+        args[1] = lba;
+        args[2] = value;
+        return commandFactory.makeCommand(args);
     }
 }

@@ -20,16 +20,16 @@ public class CommandFactory {
 
         switch (args[0]){
             case "R":
-                return new Command(args[0], args[1]);
+                return new CommandRead(args[0], args[1]);
             case "W":
-                return new Command(args[0], args[1], args[2]);
+                return new CommandWrite(args[0], args[1], args[2]);
             case "E":
                 int eraseLba = Integer.parseInt(args[1]);
                 int eraseSize = Integer.parseInt(args[2]);
                 if(isExceedEraseRange(eraseLba, eraseSize)){
                     eraseSize = MAX_LBA + 1 - eraseLba;
                 }
-                return new Command(args[0], args[1], String.valueOf(eraseSize));
+                return new CommandErase(args[0], args[1], String.valueOf(eraseSize));
             default:
                 return null;
         }
