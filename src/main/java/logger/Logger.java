@@ -1,14 +1,30 @@
 package logger;
 
+import org.assertj.core.util.VisibleForTesting;
+
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 public class Logger {
     private static final HashMap<String, Logger> loggerMap = new HashMap<>();
     private static final String logFormat = "";
-    private final String logPath;
+    static final long MAX_LOG_BYTES = 10000;
+    private String logPath;
 
-    private Logger(String logPath){
+    Logger() {
+        // for test
+    }
+
+    private Logger(String logPath) {
         this.logPath = logPath;
     }
 
@@ -22,18 +38,80 @@ public class Logger {
     }
 
     public void writeLog(String content) {
-
     }
 
     public File getLogFile() {
         return new File("");
     }
 
-    public File rollingLogFile(File logFile) {
-        return new File("");
+    public void rollLogFile(File logFile) {
+        try {
+            if (isLogSizeFull(logFile)) {
+                List<File> pastFiles = getPastLogFilesFrom(logFile);
+
+                for (File file : pastFiles) {
+                    compress(file);
+                }
+
+                changeLogFile(logFile);
+            }
+        } catch (IOException e) {
+            System.out.println("Failed to roll log file. " + e.getMessage());
+        }
     }
 
     public String formatting(String content) {
         return content;
+    }
+
+    @VisibleForTesting
+    boolean isLogSizeFull(File file) throws IOException {
+        return Files.size(file.toPath()) > MAX_LOG_BYTES;
+    }
+
+    @VisibleForTesting
+    List<File> getPastLogFilesFrom(File file) throws IOException {
+        File logDir = file.getParentFile();
+
+        List<File> pastFiles = new ArrayList<>();
+
+        for (File pastFile : logDir.listFiles()) {
+            if (isCompressible(pastFile) && compareFileTime(file, pastFile) < 0) {
+                pastFiles.add(pastFile);
+            }
+        }
+
+        return pastFiles;
+    }
+
+    @VisibleForTesting
+    void compress(File file) throws IOException {
+        Path logPath = file.toPath();
+
+        String logName = logPath.getFileName().toString();
+        String compressedName = logName.replace(".log", ".zip");
+
+        Files.move(logPath, logPath.resolveSibling(compressedName));
+    }
+
+    @VisibleForTesting
+    void changeLogFile(File file) throws IOException {
+        Path logPath = file.toPath();
+
+        DateFormat dateFormat = new SimpleDateFormat("'until'_yyMMdd_HH'h'_mm'm'_ss's'.'log'");
+        String changedName = dateFormat.format(new Date());
+
+        Files.move(logPath, logPath.resolveSibling(changedName));
+    }
+
+    private boolean isCompressible(File file) {
+        return file.getName().endsWith(".log");
+    }
+
+    private int compareFileTime(File file, File pastFile) throws IOException {
+        FileTime latestTime = Files.getLastModifiedTime(file.toPath());
+        FileTime pastTime = Files.getLastModifiedTime(pastFile.toPath());
+
+        return pastTime.compareTo(latestTime);
     }
 }
