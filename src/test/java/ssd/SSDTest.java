@@ -392,18 +392,64 @@ class SSDTest {
 
         @Test
         @Order(6)
-        void mainWithFlushArgument01(){
-            String[] args = new String[1];
-            args[0] = "F";
+        void main06(){
+            String[] args = new String[3];
+            args[0] = "W";
+            args[1] = "15";
+            args[2] = "0x01010101";
             SSD.main(args);
         }
 
         @Test
-        @Order(6)
-        void mainWithFlushWrongArgument01(){
+        @Order(7)
+        void main07(){
             String[] args = new String[2];
+            args[0] = "W";
+            args[1] = "16";
+            SSD.main(args);
+        }
+
+        @Test
+        @Order(8)
+        void main08(){
+            String[] args = new String[2];
+            args[0] = "R";
+            args[1] = "15";
+            SSD.main(args);
+        }
+
+        @Test
+        @Order(9)
+        void main09(){
+            String[] args = new String[2];
+            args[0] = "R";
+            args[1] = "17";
+            SSD.main(args);
+        }
+
+        @Test
+        @Order(10)
+        void main10(){
+            String[] args = new String[2];
+            args[0] = "R";
+            args[1] = "18";
+            SSD.main(args);
+        }
+
+        @Test
+        @Order(11)
+        void main11(){
+            String[] args = new String[2];
+            args[0] = "R";
+            args[1] = "19";
+            SSD.main(args);
+        }
+
+        @Test
+        @Order(12)
+        void main12(){
+            String[] args = new String[1];
             args[0] = "F";
-            args[1] = "1";
             SSD.main(args);
         }
     }
