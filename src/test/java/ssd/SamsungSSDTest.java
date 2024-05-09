@@ -15,27 +15,27 @@ class SamsungSSDTest {
     @Test
     @Disabled("Command Factory에서 Invalid Argument Check 하도록 변경하여, 불가능한 Test Case로 판명")
     void readInvalidArgumentMinusLBATest(){
-        Command command = new CommandRead("R", "-1");
+        Command command = new CommandRead("R", -1);
         command.execute();
     }
 
     @Test
     @Disabled("Command Factory에서 Invalid Argument Check 하도록 변경하여, 불가능한 Test Case로 판명")
     void readInvalidArgumentOverMaxLBATest(){
-        Command command = new CommandRead("R", "100");
+        Command command = new CommandRead("R", 100);
         command.execute();
     }
 
     @Test
     @Disabled("Command Factory에서 Invalid Argument Check 하도록 변경하여, 불가능한 Test Case로 판명")
     void readInterfaceLbaData(){
-        Command command = new CommandRead("R", "14");
+        Command command = new CommandRead("R", 14);
         command.execute();
     }
 
     @Test
     void readLbaData(){
-        Command command = new CommandRead("R", "4");
+        Command command = new CommandRead("R", 4);
         command.execute();
     }
 
@@ -49,7 +49,7 @@ class SamsungSSDTest {
     void writeThrowRuntimeExceptionWhenDataValueExceedInteger(){
         try {
             // when
-            Command command = new CommandWrite("W", "1", "0x1298CDXF");
+            Command command = new CommandWrite("W", 1, "0x1298CDXF");
             command.execute();
             fail();
         } catch(RuntimeException e) {
@@ -64,7 +64,7 @@ class SamsungSSDTest {
     void writeThrowRuntimeExceptionWhenLbaValueExceedInteger(){
         try {
             // when
-            Command command = new CommandWrite("W", "-1", "0x12345678");
+            Command command = new CommandWrite("W", -1, "0x12345678");
             command.execute();
             fail();
         } catch(RuntimeException e) {
@@ -77,7 +77,7 @@ class SamsungSSDTest {
     @DisplayName("data 값에 prefix 0x 값이 아닌 경우 RuntimeException")
     void writeThrowRuntimeExceptionWhenPrefixValueIsNot0x(){
         try {
-            Command command = new CommandWrite("W", "1", "0012345678");
+            Command command = new CommandWrite("W", 1, "0012345678");
             command.execute();
         } catch(RuntimeException e) {
             assertThat(e).isInstanceOf(RuntimeException.class);
@@ -95,7 +95,7 @@ class SamsungSSDTest {
         }
 
         // when
-        Command command = new CommandWrite("W", "1", "0x12345678");
+        Command command = new CommandWrite("W", 1, "0x12345678");
         command.execute();
 
         // then
@@ -111,7 +111,7 @@ class SamsungSSDTest {
             createSampleNandTxt();
 
             // when
-            Command command = new CommandWrite("W", "1", "0x12345678");
+            Command command = new CommandWrite("W", 1, "0x12345678");
             command.execute();
 
             // then

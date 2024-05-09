@@ -7,43 +7,43 @@ import java.io.*;
 
 public class CommandErase extends Command{
 
-    private String cmd = "";
-    private String lba = "";
-    private String value = "";
+    private String cmd;
+    private int lba;
+    private int size;
 
-    public CommandErase(String cmd, String lba, String value) {
+    public CommandErase(String cmd, int lba, int value) {
         this.cmd = cmd;
         this.lba = lba;
-        this.value = value;
+        this.size = value;
     }
 
     public String getCmd() {
         return cmd;
     }
 
-    public String getLba() {
+    public int getLba() {
         return lba;
     }
 
-    public String getValue() {
-        return value;
+    public int getSize() {
+        return size;
     }
 
     public void setCmd(String cmd) {
         this.cmd = cmd;
     }
 
-    public void setLba(String lba) {
+    public void setLba(int lba) {
         this.lba = lba;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setSize(int size) {
+        this.size = size;
     }
 
     @Override
     void execute() {
-        for(int startLba = Integer.parseInt(getLba()); startLba<(Integer.parseInt(getValue())+Integer.parseInt(getLba())); startLba++){
+        for(int startLba = this.lba; startLba < this.lba + this.size; startLba++){
             writeNandTxtFile(String.valueOf(startLba), EMPTY_DATA_VALUE);
         }
     }

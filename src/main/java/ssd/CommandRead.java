@@ -7,11 +7,10 @@ import java.io.*;
 
 public class CommandRead extends Command{
 
-    private String cmd = "";
-    private String lba = "";
-    private String value = "";
+    private String cmd;
+    private int lba;
 
-    public CommandRead(String cmd, String lba) {
+    public CommandRead(String cmd, int lba) {
         this.cmd = cmd;
         this.lba = lba;
     }
@@ -20,29 +19,21 @@ public class CommandRead extends Command{
         return cmd;
     }
 
-    public String getLba() {
+    public int getLba() {
         return lba;
-    }
-
-    public String getValue() {
-        return value;
     }
 
     public void setCmd(String cmd) {
         this.cmd = cmd;
     }
 
-    public void setLba(String lba) {
+    public void setLba(int lba) {
         this.lba = lba;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
     }
 
     @Override
     void execute() {
-        String readValue = readNandFileForTargetLBA(getLba());
+        String readValue = readNandFileForTargetLBA(Integer.toString(getLba()));
         writeResultFile(readValue);
     }
 
