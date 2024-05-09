@@ -8,7 +8,7 @@ public class ArgumentInvalidChecker {
     protected static final Logger logger = Logger.getInstance("./ssd");
 
     public static boolean checkArgument(String[] cmdArgs) {
-        if(cmdArgs == null) return true;
+        if(cmdArgs == null || cmdArgs.length==0) return true;
 
         if(cmdArgs[0].equals("R")){
             if(cmdArgs.length != 2) {
