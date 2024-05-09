@@ -3,7 +3,8 @@ package ssd;
 public enum CommandCode {
     R("R"),
     W("W"),
-    E("E");
+    E("E"),
+    F("F");
 
     final String cmd;
 
