@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommandBuffer {
+    public static final int MAX_BUFFER_SIZE = 10;
     private String BUFFER_PATH = "./buffer.txt";
     CommandFactory commandFactory;
     List<Command> commands;
@@ -45,7 +46,7 @@ public class CommandBuffer {
     }
 
     public boolean full(){
-        return this.commands.size() == 10;
+        return this.commands.size() == MAX_BUFFER_SIZE;
     }
 
     public Command getCommand(){

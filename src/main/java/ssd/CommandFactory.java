@@ -14,24 +14,28 @@ public class CommandFactory {
     }
 
     Command makeCommand(String[] args){
-        //validation check
         if(isInvalidCommand(args))
-            return null;
+            return new CommandVoid();
 
         switch (args[0]){
             case "R":
-                return new CommandRead(args[0], args[1]);
+                String readCmd = args[0];
+                int readLba = Integer.parseInt(args[1]);
+                return new CommandRead(readCmd, readLba);
+
             case "W":
-                return new CommandWrite(args[0], args[1], args[2]);
+                int writeLba = Integer.parseInt(args[1]);
+                String writeData = args[2];
+                return new CommandWrite(args[0], writeLba, writeData);
+
             case "E":
                 int eraseLba = Integer.parseInt(args[1]);
                 int eraseSize = Integer.parseInt(args[2]);
-                if(isExceedEraseRange(eraseLba, eraseSize)){
+                if(isExceedEraseRange(eraseLba, eraseSize))
                     eraseSize = MAX_LBA + 1 - eraseLba;
-                }
-                return new CommandErase(args[0], args[1], String.valueOf(eraseSize));
+                return new CommandErase(args[0], eraseLba, eraseSize);
             default:
-                return null;
+                return new CommandVoid();
         }
     }
 

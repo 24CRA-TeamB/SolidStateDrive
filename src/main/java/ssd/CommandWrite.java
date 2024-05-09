@@ -7,49 +7,49 @@ import java.io.*;
 
 public class CommandWrite extends Command{
 
-    private String cmd = "";
-    private String lba = "";
-    private String value = "";
+    private String cmd;
+    private int lba;
+    private String data;
 
-    public CommandWrite(String cmd, String lba, String value) {
+    public CommandWrite(String cmd, int lba, String data) {
         this.cmd = cmd;
         this.lba = lba;
-        this.value = value;
+        this.data = data;
     }
 
     public String getCmd() {
         return cmd;
     }
 
-    public String getLba() {
+    public int getLba() {
         return lba;
     }
 
-    public String getValue() {
-        return value;
+    public String getData() {
+        return data;
     }
 
     public void setCmd(String cmd) {
         this.cmd = cmd;
     }
 
-    public void setLba(String lba) {
+    public void setLba(int lba) {
         this.lba = lba;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setData(String value) {
+        this.data = data;
     }
 
     @Override
     void execute() {
-        if(!isValidData(getValue()))
+        if(!isValidData(this.data))
             throw new RuntimeException();
 
-        if(Integer.parseInt(getLba()) < 0)
+        if(this.lba < 0)
             throw new RuntimeException();
 
-        writeNandTxtFile(getLba(), getValue());
+        writeNandTxtFile(Integer.toString(this.lba), this.data);
     }
 
     private boolean isValidData(String data) {
