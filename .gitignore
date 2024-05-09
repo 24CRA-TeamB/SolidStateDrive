@@ -1,3 +1,5 @@
+*.log
+*.zip
 .idea/
 out/
 target/

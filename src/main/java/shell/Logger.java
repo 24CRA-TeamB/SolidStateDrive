@@ -44,7 +44,8 @@ public class Logger {
         try {
             String invokeMethod = getInvokeMethodName(Thread.currentThread().getStackTrace());
             String formattedContent = formatLogContent(invokeMethod, content);
-            getLogFile();
+            File logFile = getLogFile();
+            rollLogFile(logFile);
             appendLogFile(formattedContent);
             System.out.println(formattedContent);
         } catch (IOException e) {

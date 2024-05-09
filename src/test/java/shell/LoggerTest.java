@@ -1,4 +1,4 @@
-package logger;
+package shell;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,11 +9,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static logger.Logger.MAX_LOG_BYTES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.Spy.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,6 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static shell.Logger.MAX_LOG_BYTES;
 
 @ExtendWith(MockitoExtension.class)
 class LoggerTest {
