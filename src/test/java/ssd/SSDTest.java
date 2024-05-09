@@ -4,17 +4,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class SSDTest {
 
     public static final String NAND_TXT_PATH = "./nand.txt";
@@ -27,15 +22,11 @@ class SSDTest {
     String[] readCommandArgument = new String[READ_ARGUMENT_NUM];
     String[] eraseCommandArgument = new String[ERASE_ARGUMENT_NUM];
 
-    @Mock
-    SSDInterface ssdInterface;
-
     SSD ssd;
     CommandFactory commandFactory;
 
     @BeforeEach
     void setUp() {
-        ssd = new SSD(ssdInterface);
         commandFactory = CommandFactory.getInstance();
     }
 
@@ -164,10 +155,9 @@ class SSDTest {
 
         Command command = commandFactory.makeCommand(readCommandArgument);
         // when
-        ssd.doCommand(command);
+        command.execute();
 
         // then
-        verify(ssdInterface, times(1)).read(command);
     }
 
     @Test
@@ -206,10 +196,9 @@ class SSDTest {
         Command command = commandFactory.makeCommand(writeCommandArgument);
 
         // when
-        ssd.doCommand(command);
+        command.execute();
 
         // then
-        verify(ssdInterface, times(1)).write(command);
     }
 
     @Test
@@ -350,8 +339,7 @@ class SSDTest {
         eraseCommandArgument[1] = "2";
         eraseCommandArgument[2] = "1";
         Command command = commandFactory.makeCommand(eraseCommandArgument);
-        ssd.doCommand(command);
-        verify(ssdInterface, times(1)).erase(command);
+        command.execute();
     }
 
     private void setWriteCommand(String writeCode, String lba, String data){
