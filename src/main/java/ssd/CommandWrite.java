@@ -43,21 +43,8 @@ public class CommandWrite extends Command{
 
     @Override
     void execute() {
-        if(!isValidData(this.data))
-            throw new RuntimeException();
-
-        if(this.lba < 0)
-            throw new RuntimeException();
-
         writeNandTxtFile(Integer.toString(this.lba), this.data);
-    }
-
-    private boolean isValidData(String data) {
-        if(!(data.charAt(0)=='0' && data.charAt(1) == 'x'))
-            return false;
-        if(hasInvalidHexaDecimalChar(data))
-            return false;
-        return true;
+        logger.writeLog("[SUCCESS] LBA: "+getLba() +", Data: "+ getData());
     }
 
     private boolean hasInvalidHexaDecimalChar(String data) {
@@ -86,8 +73,10 @@ public class CommandWrite extends Command{
 
             writeJsonArrayToNandTxtPath(jsonArray);
         } catch (FileNotFoundException e) {
+            logger.writeLog("[ERROR] nand.txt 파일을 찾지 못했습니다.");
             throw new RuntimeException(e);
         } catch (IOException e) {
+            logger.writeLog("[ERROR] nand.txt Write 시 문제가 발생했습니다.");
             throw new RuntimeException(e);
         }
     }

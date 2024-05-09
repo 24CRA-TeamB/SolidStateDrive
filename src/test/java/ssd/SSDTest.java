@@ -1,9 +1,6 @@
 package ssd;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.File;
 
@@ -37,7 +34,7 @@ class SSDTest {
         setReadCommand("S", "15");
 
         // when
-        boolean isInvalid = commandFactory.isInvalidCommand(readCommandArgument);
+        boolean isInvalid = ArgumentInvalidChecker.checkArgument(readCommandArgument);
 
         // then
         assertTrue(isInvalid);
@@ -50,7 +47,7 @@ class SSDTest {
         setReadCommand("R", "X");
 
         // when
-        boolean isInvalid = commandFactory.isInvalidCommand(readCommandArgument);
+        boolean isInvalid = ArgumentInvalidChecker.checkArgument(readCommandArgument);
 
         // then
         assertTrue(isInvalid);
@@ -63,7 +60,7 @@ class SSDTest {
         setReadCommand("R", "-1");
 
         // when
-        boolean isInvalid = commandFactory.isInvalidCommand(readCommandArgument);
+        boolean isInvalid = ArgumentInvalidChecker.checkArgument(readCommandArgument);
 
         // then
         assertTrue(isInvalid);
@@ -76,7 +73,7 @@ class SSDTest {
         setReadCommand("R", "100");
 
         // when
-        boolean isInvalid = commandFactory.isInvalidCommand(readCommandArgument);
+        boolean isInvalid = ArgumentInvalidChecker.checkArgument(readCommandArgument);
 
         // then
         assertTrue(isInvalid);
@@ -89,7 +86,7 @@ class SSDTest {
         setReadCommand("R", "99");
 
         // when
-        boolean isInvalid = commandFactory.isInvalidCommand(readCommandArgument);
+        boolean isInvalid = ArgumentInvalidChecker.checkArgument(readCommandArgument);
 
         // then
         assertFalse(isInvalid);
@@ -102,7 +99,7 @@ class SSDTest {
         setWriteCommand("W", "99", "0a01103302");
 
         // when
-        boolean isInvalid = commandFactory.isInvalidCommand(writeCommandArgument);
+        boolean isInvalid = ArgumentInvalidChecker.checkArgument(writeCommandArgument);
 
         // then
         assertTrue(isInvalid);
@@ -115,7 +112,7 @@ class SSDTest {
         setWriteCommand("W", "99", "0x011033021");
 
         // when
-        boolean isInvalid = commandFactory.isInvalidCommand(writeCommandArgument);
+        boolean isInvalid = ArgumentInvalidChecker.checkArgument(writeCommandArgument);
 
         // then
         assertTrue(isInvalid);
@@ -128,7 +125,7 @@ class SSDTest {
         setWriteCommand("W", "99", "0x0119010K");
 
         // when
-        boolean isInvalid = commandFactory.isInvalidCommand(writeCommandArgument);
+        boolean isInvalid = ArgumentInvalidChecker.checkArgument(writeCommandArgument);
 
         // then
         assertTrue(isInvalid);
@@ -141,7 +138,7 @@ class SSDTest {
         setWriteCommand("W", "99", "0x0119010A");
 
         // when
-        boolean isInvalid = commandFactory.isInvalidCommand(writeCommandArgument);
+        boolean isInvalid = ArgumentInvalidChecker.checkArgument(writeCommandArgument);
 
         // then
         assertFalse(isInvalid);
@@ -170,14 +167,14 @@ class SSDTest {
         setWriteCommand("W", "X", "0x12345678");
 
         // then
-        assertEquals(true, commandFactory.isImpossibleToParseToInt(writeCommandArgument[1]));
+        assertEquals(true, ArgumentInvalidChecker.isImpossibleToParseToInt(writeCommandArgument[1]));
     }
 
     @Test
     @DisplayName("Logic Block Address 값의 최소값과 최대값을 검증한다")
     void isInvalidLBA() {
-        assertEquals(true, commandFactory.isInvalidLBA(MIN_LBA-1));
-        assertEquals(true, commandFactory.isInvalidLBA(MAX_LBA+1));
+        assertEquals(true, ArgumentInvalidChecker.isInvalidLBA(MIN_LBA-1));
+        assertEquals(true, ArgumentInvalidChecker.isInvalidLBA(MAX_LBA+1));
     }
 
     @Test
@@ -208,7 +205,7 @@ class SSDTest {
         setReadCommand("R", "01");
 
         // when
-        boolean success = commandFactory.isImpossibleToParseToInt(readCommandArgument[1]);
+        boolean success = ArgumentInvalidChecker.isImpossibleToParseToInt(readCommandArgument[1]);
 
         // then
         assertFalse(success);
@@ -216,7 +213,7 @@ class SSDTest {
 
     @Test
     void invalidArgumentTC01(){
-        boolean isInvalid = commandFactory.isInvalidCommand(null);
+        boolean isInvalid = ArgumentInvalidChecker.checkArgument(null);
 
         assertTrue(isInvalid);
     }
@@ -226,7 +223,7 @@ class SSDTest {
         String[] args = new String[1];
         args[0] = "W";
 
-        boolean isInvalid = commandFactory.isInvalidCommand(args);
+        boolean isInvalid = ArgumentInvalidChecker.checkArgument(args);
 
         assertTrue(isInvalid);
     }
@@ -236,7 +233,7 @@ class SSDTest {
         String[] args = new String[1];
         args[0] = "R";
 
-        boolean isInvalid = commandFactory.isInvalidCommand(args);
+        boolean isInvalid = ArgumentInvalidChecker.checkArgument(args);
 
         assertTrue(isInvalid);
     }
@@ -247,7 +244,7 @@ class SSDTest {
         args[0] = "W";
         args[1] = "33";
 
-        boolean isInvalid = commandFactory.isInvalidCommand(args);
+        boolean isInvalid = ArgumentInvalidChecker.checkArgument(args);
 
         assertTrue(isInvalid);
     }
@@ -259,7 +256,7 @@ class SSDTest {
         args[1] = "29";
         args[2] = "0x223123";
 
-        boolean isInvalid = commandFactory.isInvalidCommand(args);
+        boolean isInvalid = ArgumentInvalidChecker.checkArgument(args);
 
         assertTrue(isInvalid);
     }
@@ -271,7 +268,7 @@ class SSDTest {
         args[1] = "99";
         args[2] = "0x22312323";
 
-        boolean isInvalid = commandFactory.isInvalidCommand(args);
+        boolean isInvalid = ArgumentInvalidChecker.checkArgument(args);
 
         assertTrue(isInvalid);
     }
@@ -282,7 +279,7 @@ class SSDTest {
         args[0] = "R";
         args[1] = "W";
 
-        boolean isInvalid = commandFactory.isInvalidCommand(args);
+        boolean isInvalid = ArgumentInvalidChecker.checkArgument(args);
 
         assertTrue(isInvalid);
     }
@@ -294,7 +291,7 @@ class SSDTest {
         args[1] = "1";
         args[2] = "11";
 
-        boolean isInvalid = commandFactory.isInvalidCommand(args);
+        boolean isInvalid = ArgumentInvalidChecker.checkArgument(args);
 
         assertTrue(isInvalid);
     }
@@ -340,6 +337,75 @@ class SSDTest {
         eraseCommandArgument[2] = "1";
         Command command = commandFactory.makeCommand(eraseCommandArgument);
         command.execute();
+    }
+
+    @Nested
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    class MainTest {
+        @Test
+        @Order(1)
+        void mainWithReadArgument01(){
+            String[] args = new String[2];
+            args[0] = "R";
+            args[1] = "0";
+            SSD.main(args);
+        }
+
+        @Test
+        @Order(2)
+        void mainWithWriteArgument01(){
+            String[] args = new String[3];
+            args[0] = "W";
+            args[1] = "1";
+            args[2] = "0x22312312";
+            SSD.main(args);
+        }
+
+        @Test
+        @Order(3)
+        void mainWithEraseArgument01(){
+            String[] args = new String[3];
+            args[0] = "E";
+            args[1] = "1";
+            args[2] = "10";
+            SSD.main(args);
+        }
+
+        @Test
+        @Order(4)
+        void mainWithWriteArgument02(){
+            String[] args = new String[3];
+            args[0] = "W";
+            args[1] = "1";
+            args[2] = "0x01010101";
+            SSD.main(args);
+        }
+
+        @Test
+        @Order(5)
+        void mainWithReadArgument02(){
+            String[] args = new String[2];
+            args[0] = "R";
+            args[1] = "1";
+            SSD.main(args);
+        }
+
+        @Test
+        @Order(6)
+        void mainWithFlushArgument01(){
+            String[] args = new String[1];
+            args[0] = "F";
+            SSD.main(args);
+        }
+
+        @Test
+        @Order(6)
+        void mainWithFlushWrongArgument01(){
+            String[] args = new String[2];
+            args[0] = "F";
+            args[1] = "1";
+            SSD.main(args);
+        }
     }
 
     private void setWriteCommand(String writeCode, String lba, String data){

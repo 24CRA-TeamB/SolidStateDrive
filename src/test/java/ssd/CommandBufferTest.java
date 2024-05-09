@@ -11,10 +11,11 @@ class CommandBufferTest {
     @DisplayName("테스트 파일에 적힌 문자열을 읽어서 6개 Command 객체를 만든다")
     void givenSampleBufferFile_whenCheckCommandSize_thenSizeIs6(){
         // given
-        CommandBuffer commandBuffer = new CommandBuffer();
+        CommandFactory commandFactory = CommandFactory.getInstance();
+        CommandBuffer commandBuffer = new CommandBuffer(commandFactory);
 
         // when
-        int size = commandBuffer.commands.size();
+        int size = commandBuffer.getSize();
 
         // then
         assertThat(size).isEqualTo(6);

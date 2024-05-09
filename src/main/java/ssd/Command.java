@@ -12,6 +12,7 @@ abstract class Command {
     public static final String EMPTY_DATA_VALUE = "0x00000000";
     public static final String NAND_TXT_PATH = "./nand.txt";
     public static final String RESULT_TXT_PATH = "./result.txt";
+    protected static final Logger logger = Logger.getInstance("./ssd");
 
     abstract void execute();
 
@@ -44,7 +45,7 @@ abstract class Command {
                 writeJsonArrayToNandTxtPath(jsonArray);
             }
         } catch (IOException e) {
-            System.out.println("파일을 생성하는 도중 오류가 발생했습니다.");
+            logger.writeLog("[ERROR] nand.txt 파일을 생성하는 도중 오류가 발생했습니다.");
         }
     }
 

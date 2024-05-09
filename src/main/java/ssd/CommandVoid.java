@@ -22,7 +22,7 @@ public class CommandVoid extends Command{
             writer.write(readValue);
             writer.close();
         } catch (IOException e) {
-            System.out.println("파일 쓰기 중 오류가 발생했습니다: " + e.getMessage());
+            logger.writeLog("[ERROR] result.txt 쓰기 중 오류가 발생했습니다: "+ e.getMessage());
         }
     }
 }

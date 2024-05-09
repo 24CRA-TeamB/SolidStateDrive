@@ -46,6 +46,7 @@ public class CommandErase extends Command{
         for(int startLba = this.lba; startLba < this.lba + this.size; startLba++){
             writeNandTxtFile(String.valueOf(startLba), EMPTY_DATA_VALUE);
         }
+        logger.writeLog("[SUCCESS] StartLBA: "+getLba()+", Size: "+getSize());
     }
 
     private void writeNandTxtFile(String lba, String data) {
@@ -65,8 +66,10 @@ public class CommandErase extends Command{
 
             writeJsonArrayToNandTxtPath(jsonArray);
         } catch (FileNotFoundException e) {
+            logger.writeLog("[ERROR] nand.txt 파일을 찾지 못했습니다.");
             throw new RuntimeException(e);
         } catch (IOException e) {
+            logger.writeLog("[ERROR] nand.txt Write 시 문제가 발생했습니다.");
             throw new RuntimeException(e);
         }
     }

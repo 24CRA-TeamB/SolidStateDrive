@@ -35,6 +35,7 @@ public class CommandRead extends Command{
     void execute() {
         String readValue = readNandFileForTargetLBA(Integer.toString(getLba()));
         writeResultFile(readValue);
+        logger.writeLog("[SUCCESS] LBA: "+getLba());
     }
 
     private String readNandFileForTargetLBA(String lba) {
@@ -53,7 +54,7 @@ public class CommandRead extends Command{
             writer.write(readValue);
             writer.close();
         } catch (IOException e) {
-            System.out.println("파일 쓰기 중 오류가 발생했습니다: " + e.getMessage());
+            logger.writeLog("[ERROR] result.txt 쓰기 중 오류가 발생했습니다: "+ e.getMessage());
         }
     }
 
@@ -72,7 +73,7 @@ public class CommandRead extends Command{
 
             return stringBuilder.toString();
         } catch (IOException e) {
-            System.out.println("파일을 읽는 도중 오류가 발생했습니다: " + e.getMessage());
+            logger.writeLog("[ERROR] nand.txt 읽는 중 오류가 발생했습니다: "+ e.getMessage());
         }
 
         return null;
