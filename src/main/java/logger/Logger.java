@@ -9,20 +9,20 @@ public class Logger {
     private static final HashMap<String, Logger> loggerMap = new HashMap<>();
     public static final String FORMAT_TIMESTAMP = "yy.MM.dd HH:mm";
     public static final int METHOD_PADDING_LENGTH = 30;
-    private final String logPath;
-    private File logFile;
+    private final String logDir;
+    private final String logFileName = "latest.log";
 
-    private Logger(String logPath){
-        this.logPath = logPath;
+    private Logger(String logDir){
+        this.logDir = logDir;
     }
 
-    public static Logger getInstance(String filePath) {
-        if (loggerMap.containsKey(filePath) == false) {
-            Logger newLogger = new Logger(filePath);
-            loggerMap.put(filePath, newLogger);
+    public static Logger getInstance(String logDir) {
+        if (loggerMap.containsKey(logDir) == false) {
+            Logger newLogger = new Logger(logDir);
+            loggerMap.put(logDir, newLogger);
         }
 
-        return loggerMap.get(filePath);
+        return loggerMap.get(logDir);
     }
 
     public void writeLog(String content) {
@@ -47,12 +47,8 @@ public class Logger {
         return stackTraceElements[2].getMethodName();
     }
 
-    public File getLogFile() throws IOException {
-        logFile = new File(this.logPath);
-        if (!logFile.exists()) {
-            logFile.createNewFile();
-        }
-        return logFile;
+    private String getLogFilePath() {
+        return this.logDir + "/" + this.logFileName;
     }
 
     public File rollingLogFile(File logFile) {
@@ -72,5 +68,14 @@ public class Logger {
 
     private String getRightPaddedString(String content, int padLength) {
         return String.format("%1$-" + padLength + "s", content);
+    }
+
+    public File getLogFile() throws IOException {
+        System.out.println(getLogFilePath());
+        File logFile = new File(getLogFilePath());
+        if (!logFile.exists()) {
+            logFile.createNewFile();
+        }
+        return logFile;
     }
 }
