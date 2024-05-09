@@ -10,6 +10,7 @@ import java.util.List;
 public class CommandBuffer {
     public static final int MAX_BUFFER_SIZE = 10;
     private static final String BUFFER_TXT_PATH = "./buffer.txt";
+    public static final String RESULT_TXT_PATH = "./result.txt";
     protected static final Logger logger = Logger.getInstance("./ssd");
 
     private final List<Command> commands;
@@ -25,13 +26,13 @@ public class CommandBuffer {
             command.execute();
     }
 
+    public boolean empty(){
+        return this.commands.isEmpty();
+    }
+
     public void addCommand(Command command){
         this.commands.add(command);
         optimize();
-    }
-
-    public boolean empty(){
-        return this.commands.isEmpty();
     }
 
     public boolean full(){
@@ -122,6 +123,45 @@ public class CommandBuffer {
     }
 
     public void flush() {
-        logger.writeLog("[SUCCESS] Flush");
+        logger.writeLog("[SUCCESS] -------- Flush Start --------- ");
+        execute();
+        clearHistory();
+        logger.writeLog("[SUCCESS] -------- Flush Start --------- ");
+    }
+
+    public void read(Command command, String lba) {
+        int pos = Integer.parseInt(lba);
+
+        for(int i = this.commands.size() - 1; i >= 0; i--){
+            Command cmd = this.commands.get(i);
+            if(cmd instanceof CommandWrite && pos == ((CommandWrite) cmd).getLba()){
+                String data = ((CommandWrite) cmd).getData();
+                writeResultFromBuffer(data);
+                logger.writeLog("[SUCCESS] LBA: " + pos + " FROM BUFFER");
+                return;
+            }
+
+            if(cmd instanceof CommandErase){
+                int start = ((CommandErase) cmd).getLba();
+                int size = ((CommandErase) cmd).getSize();
+                if(start <= pos && pos < start + size) {
+                    writeResultFromBuffer("0x00000000");
+                    logger.writeLog("[SUCCESS] LBA: " + pos + " FROM BUFFER");
+                    return;
+                }
+            }
+        }
+
+        command.execute();
+    }
+
+    private void writeResultFromBuffer(String readValue) {
+        try {
+            FileWriter writer = new FileWriter(RESULT_TXT_PATH);
+            writer.write(readValue);
+            writer.close();
+        } catch (IOException e) {
+            logger.writeLog("[ERROR] Buffer 에서 result.txt 쓰기 중 오류가 발생했습니다: "+ e.getMessage());
+        }
     }
 }

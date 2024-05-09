@@ -17,9 +17,8 @@ public class SSD {
             buffer.flush();
         }
         else if(cmdCode.equals(CommandCode.R)){
-            buffer.execute();
             Command command = commandFactory.makeCommand(args);
-            command.execute();
+            buffer.read(command, args[1]);
         }
         else {
             Command command = commandFactory.makeCommand(args);
@@ -27,8 +26,7 @@ public class SSD {
         }
 
         if(buffer.full()){
-            buffer.execute();
-            buffer.clearHistory();
+            buffer.flush();
         }
 
         buffer.store();

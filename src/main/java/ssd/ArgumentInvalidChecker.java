@@ -94,7 +94,7 @@ public class ArgumentInvalidChecker {
     }
 
     public static boolean isExceedEraseRange(int lba, int size) {
-        return lba + size - 1 > MAX_ERASE_SIZE;
+        return lba + size - 1 > MAX_LBA;
     }
 
     public static boolean isInvalidEraseSize(int size) {

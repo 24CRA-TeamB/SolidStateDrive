@@ -11,10 +11,10 @@ public class CommandErase extends Command{
     private int lba;
     private int size;
 
-    public CommandErase(String cmd, int lba, int value) {
+    public CommandErase(String cmd, int lba, int size) {
         this.cmd = cmd;
         this.lba = lba;
-        this.size = value;
+        this.size = size;
     }
 
     public String getCmd() {
@@ -46,7 +46,7 @@ public class CommandErase extends Command{
         for(int startLba = this.lba; startLba < this.lba + this.size; startLba++){
             writeNandTxtFile(String.valueOf(startLba), EMPTY_DATA_VALUE);
         }
-        logger.writeLog("[SUCCESS] StartLBA: "+getLba()+", Size: "+getSize());
+        logger.writeLog("[SUCCESS] StartLBA: "+getLba()+", Size: " + getSize());
     }
 
     private void writeNandTxtFile(String lba, String data) {
