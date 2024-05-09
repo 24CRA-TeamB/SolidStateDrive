@@ -6,20 +6,24 @@ import java.util.List;
 
 public class SSDExecutor {
     private final String jar;
+    private final Logger logger = Logger.getInstance("./shell");
 
     public SSDExecutor(String jar) {
         this.jar = jar;
     }
 
     public void writeData(String lba, String data) {
+        logger.writeLog("LBA=" + lba + ", DATA=" + data);
         runCommand("W", lba, data);
     }
 
     public void readData(String lba) {
+        logger.writeLog("LBA=" + lba);
         runCommand("R", lba);
     }
 
     public void eraseData(String lba, String size) {
+        logger.writeLog("LBA=" + lba + ", SIZE=" + size);
         runCommand("E", lba, size);
     }
 
@@ -29,13 +33,14 @@ public class SSDExecutor {
 
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command(commands);
+        String command = String.join(" ", processBuilder.command());
 
         try {
             Process process = processBuilder.start();
             process.waitFor();
+            logger.writeLog("Success to run command " + command);
         } catch (Exception e) {
-            String command = String.join(" ", processBuilder.command());
-            System.out.println("Failed to run command " + command);
+            logger.writeLog("Fail to run command " + command);
         }
     }
 }

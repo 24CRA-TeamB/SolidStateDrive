@@ -1,6 +1,5 @@
 package shell;
 
-
 import org.assertj.core.util.Strings;
 import org.assertj.core.util.VisibleForTesting;
 
@@ -43,6 +42,7 @@ public class TestShell {
     static final String RESULT_FILE = "result.txt";
     private final HashMap<String, Method> methodFactory = new HashMap<>();
     private SSDExecutor ssdExecutor;
+    private static final Logger logger = Logger.getInstance("./shell");
 
     @VisibleForTesting
     TestShell() {
@@ -69,7 +69,7 @@ public class TestShell {
             methodFactory.put(TESTAPP2, this.getClass().getDeclaredMethod("testapp2", String[].class));
             methodFactory.put(INVALID_COMMAND, this.getClass().getDeclaredMethod("invalidCommand", String[].class));
         } catch (NoSuchMethodException e) {
-            System.out.println("NoSuchMethodExcetion " + e.getMessage());
+            logger.writeLog(e.getClass().getCanonicalName() + " " + e.getMessage());
             System.exit(-1);
         }
     }
@@ -83,6 +83,7 @@ public class TestShell {
     }
 
     public void run(String command, String[] arguments) {
+        logger.writeLog("command=" + command);
         Method method = getMethod(command);
         try {
             method.invoke(arguments);
@@ -93,6 +94,7 @@ public class TestShell {
 
     public void write(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_WRITE != arguments.length) {
+            logger.writeLog("The number of arguments for write should be " + arguments.length);
             return;
         }
 
@@ -101,6 +103,7 @@ public class TestShell {
 
     public void fullwrite(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_FULLWRITE != arguments.length) {
+            logger.writeLog("The number of arguments for fullwrite should be " + arguments.length);
             return;
         }
 
@@ -111,6 +114,7 @@ public class TestShell {
 
     public String read(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_READ != arguments.length) {
+            logger.writeLog("The number of arguments for read should be " + arguments.length);
             return "";
         }
 
@@ -120,6 +124,7 @@ public class TestShell {
 
     public void readAndPrint(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_READ != arguments.length) {
+            logger.writeLog("The number of arguments for read should be " + arguments.length);
             return;
         }
 
@@ -135,6 +140,7 @@ public class TestShell {
     public ArrayList<String> fullread(String[] arguments) {
         ArrayList<String> result = new ArrayList<>();
         if (NUMBER_OF_ARGUMENTS_FOR_FULLREAD != arguments.length) {
+            logger.writeLog("The number of arguments for fullread should be " + arguments.length);
             return result;
         }
 
@@ -148,6 +154,7 @@ public class TestShell {
 
     public void fullreadAndPrint(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_FULLREAD != arguments.length) {
+            logger.writeLog("The number of arguments for fullread should be " + arguments.length);
             return;
         }
 
@@ -156,6 +163,7 @@ public class TestShell {
 
     public void erase(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_ERASE != arguments.length) {
+            logger.writeLog("The number of arguments for erase should be " + arguments.length);
             return;
         }
 
@@ -176,6 +184,7 @@ public class TestShell {
 
     public void erase_range(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_ERASE_RANGE != arguments.length) {
+            logger.writeLog("The number of arguments for erase_range should be " + arguments.length);
             return;
         }
 
@@ -208,12 +217,14 @@ public class TestShell {
             Integer.parseInt(numberString);
             return false;
         } catch (NullPointerException | NumberFormatException e) {
+            logger.writeLog(numberString + " is not a number format");
             return true;
         }
     }
 
     public void exit(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_EXIT != arguments.length) {
+            logger.writeLog("The number of arguments for exit should be " + arguments.length);
             return;
         }
 
@@ -223,6 +234,7 @@ public class TestShell {
 
     public void help(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_HELP != arguments.length) {
+            logger.writeLog("The number of arguments for help should be " + arguments.length);
             return;
         }
 
@@ -237,6 +249,7 @@ public class TestShell {
 
     public void testapp1(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_TESTAPP1 != arguments.length) {
+            logger.writeLog("The number of arguments for testapp1 should be " + arguments.length);
             return;
         }
 
@@ -247,6 +260,7 @@ public class TestShell {
 
     public void testapp2(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_TESTAPP2 != arguments.length) {
+            logger.writeLog("The number of arguments for testapp2 should be " + arguments.length);
             return;
         }
 
@@ -270,34 +284,34 @@ public class TestShell {
 
     private void verifyTestApp1(ArrayList<String> result) {
         if (result.size() != NUMBER_OF_LBA) {
-            System.out.println("TestApp1 fail");
+            logger.writeLog("TestApp1 fail");
         }
 
         for (int i = 0; i < NUMBER_OF_LBA; i++) {
             String expected = i + " " + "0x12345678";
             if (expected.equals(result.get(i)) == false) {
-                System.out.println("TestApp1 fail");
+                logger.writeLog("TestApp1 fail");
                 return;
             }
         }
 
-        System.out.println("TestApp1 success");
+        logger.writeLog("TestApp1 success");
     }
 
     private void verifyTestApp2(ArrayList<String> result) {
         if (result.size() != 5) {
-            System.out.println("TestApp2 fail");
+            logger.writeLog("TestApp2 fail");
         }
 
         for (int i = 0; i < 5; i++) {
             String expected = i + " " + "0x12345678";
             if (expected.equals(result.get(i)) == false) {
-                System.out.println("TestApp2 fail");
+                logger.writeLog("TestApp2 fail");
                 return;
             }
         }
 
-        System.out.println("TestApp2 success");
+        logger.writeLog("TestApp2 success");
     }
 
     public String readResult(String file) {
@@ -305,13 +319,13 @@ public class TestShell {
             Path filePath = Paths.get(file);
             return new String(Files.readAllBytes(filePath));
         } catch (IOException e) {
-            System.out.println("Failed to read result. " + e.getMessage());
+            logger.writeLog("Failed to read result. " + e.getMessage());
             return "";
         }
     }
 
     public void invalidCommand(String[] arguments) {
-        System.out.println("Invalid commands.");
+        logger.writeLog("Invalid commands.");
     }
 
     @VisibleForTesting
