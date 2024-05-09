@@ -39,9 +39,9 @@ public class TestShell {
     public static final int NUMBER_OF_LBA = 100;
     private static final int MAX_ERASE_SIZE = 10;
     static final String RESULT_FILE = "result.txt";
-    public static final String TESTAPP1_DATA = "0x12345678";
+    public static final String TESTAPP1_DATA = "0x81726354";
     public static final String TESTAPP2_DATA1 = "0xAAAABBBB";
-    public static final String TESTAPP2_DATA2 = "0xAAAABBBB";
+    public static final String TESTAPP2_DATA2 = "0x12345678";
     private static final String[] EMPTY_ARGUMENTS = new String[]{};
     private final HashMap<String, Method> methodFactory = new HashMap<>();
     private SSDExecutor ssdExecutor;
@@ -182,7 +182,7 @@ public class TestShell {
             return;
         }
 
-        eraseSplit(size, lba);
+        eraseSplit(lba, size);
     }
 
     public void erase_range(String[] arguments) {
@@ -201,7 +201,7 @@ public class TestShell {
         eraseSplit(startLBA, endLBA - startLBA);
     }
 
-    private void eraseSplit(int size, int lba) {
+    private void eraseSplit(int lba, int size) {
         while (size > 0) {
             int eraseSize = Math.min(size, MAX_ERASE_SIZE);
 
@@ -291,8 +291,7 @@ public class TestShell {
         }
 
         for (int i = 0; i < NUMBER_OF_LBA; i++) {
-            String expected = TESTAPP1_DATA;
-            if (expected.equals(result.get(i)) == false) {
+            if (TESTAPP1_DATA.equals(result.get(i)) == false) {
                 logger.writeLog("TestApp1 fail");
                 return;
             }
