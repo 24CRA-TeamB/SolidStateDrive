@@ -5,9 +5,11 @@ import org.assertj.core.util.VisibleForTesting;
 import java.util.Scanner;
 
 public class TestShellScript {
+    private static final Logger logger = Logger.getInstance("./shell");
+
     public static void main(String[] args) {
-        if (Strings.isNullOrEmpty(args[0])) {
-            System.out.println("ssd.jar is required.");
+        if (args.length == 0 || Strings.isNullOrEmpty(args[0])) {
+            logger.writeLog("ssd.jar is required.");
             System.exit(0);
         }
 
@@ -20,6 +22,7 @@ public class TestShellScript {
             String command = getCommandFromUserInput(userInputArray);
             String[] arguments = getArgumentsFromUserInput(userInputArray);
 
+            logger.writeLog("command=" + command + "arguments=" + String.join(",", arguments));
             testShell.run(command, arguments);
         }
     }
@@ -48,6 +51,7 @@ public class TestShellScript {
         String input = "";
         while(true) {
             input = scanner.nextLine();
+            logger.writeLog("userInput=" + input);
             if (!Strings.isNullOrEmpty(input)) {
                 break;
             }
