@@ -4,17 +4,20 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
 class LoggerTest {
@@ -39,6 +42,22 @@ class LoggerTest {
     @AfterEach
     void tearDown() {
         new File(TEST_LOG_FILE).delete();
+    }
+
+    @ParameterizedTest
+    @ValueSource (ints = {1, 3, 5, 6})
+    void writeLog(int repeat) throws IOException {
+        String content = "Hello World!";
+
+        for (int i = 0; i < repeat; i++) {
+            logger.writeLog(content);
+        }
+
+        List<String> actual = Files.readAllLines(Paths.get(TEST_LOG_FILE));
+
+        assertEquals(repeat, actual.size());
+        String expected = "[" + currentDate + "] writeLog()                    Hello World!";
+        actual.forEach(log -> assertEquals(expected, log));
     }
 
     @Test
