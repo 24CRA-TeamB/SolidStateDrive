@@ -37,6 +37,8 @@ public class Logger {
             loggerMap.put(logDir, newLogger);
         }
 
+        makeDirectoryIfNotExist(logDir);
+
         return loggerMap.get(logDir);
     }
 
@@ -156,5 +158,12 @@ public class Logger {
         FileTime pastTime = Files.getLastModifiedTime(pastFile.toPath());
 
         return pastTime.compareTo(latestTime);
+    }
+
+    private static void makeDirectoryIfNotExist(String dir) {
+        File file = new File(dir);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
     }
 }
