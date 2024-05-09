@@ -3,9 +3,6 @@ package ssd;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.io.*;
 
 import static org.junit.jupiter.api.Assertions.fail;

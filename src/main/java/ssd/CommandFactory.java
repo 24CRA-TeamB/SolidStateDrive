@@ -14,9 +14,8 @@ public class CommandFactory {
     }
 
     Command makeCommand(String[] args){
-        //validation check
         if(isInvalidCommand(args))
-            return null;
+            return new CommandVoid();
 
         switch (args[0]){
             case "R":
@@ -31,7 +30,7 @@ public class CommandFactory {
                 }
                 return new CommandErase(args[0], args[1], String.valueOf(eraseSize));
             default:
-                return null;
+                return new CommandVoid();
         }
     }
 
