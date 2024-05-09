@@ -61,13 +61,14 @@ class LoggerTest {
     }
 
     @Test
-    void rollLogFile() throws IOException {
+    void rollLogFile() throws IOException, InterruptedException {
         Logger spyLogger = spy(Logger.class);
 
         doNothing().when(spyLogger).compress(any());
         doNothing().when(spyLogger).changeLogFile(any());
 
         File pastFile = createFile(tempDir.resolve(PAST_LOG));
+        Thread.sleep(1);
         File lastestFile = createFile(tempDir.resolve(LATEST_LOG));
 
         setFileSize(lastestFile, MAX_LOG_BYTES + 1);
@@ -145,7 +146,7 @@ class LoggerTest {
         List<String> actual = Files.readAllLines(Paths.get(TEST_LOG_FILE));
 
         assertEquals(repeat, actual.size());
-        String expected = "[" + currentDate + "] writeLog()                    Hello World!";
+        String expected = "[" + currentDate + "] LoggerTest.writeLog()         Hello World!";
         actual.forEach(log -> assertEquals(expected, log));
     }
 
@@ -162,9 +163,9 @@ class LoggerTest {
 
     @Test
     void formatLogContent() {
-        String actual = logger.formatLogContent("formatLogContent", "Hello World!");
+        String actual = logger.formatLogContent("LoggerTest", "formatLogContent", "Hello World!");
 
-        String expected = "[" + currentDate + "] formatLogContent()            Hello World!";
+        String expected = "[" + currentDate + "] LoggerTest.formatLogContent() Hello World!";
         assertEquals(expected, actual);
     }
 

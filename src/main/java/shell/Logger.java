@@ -18,7 +18,7 @@ import java.util.List;
 public class Logger {
     private static final HashMap<String, Logger> loggerMap = new HashMap<>();
     public static final String FORMAT_TIMESTAMP = "yy.MM.dd HH:mm";
-    public static final int METHOD_PADDING_LENGTH = 30;
+    public static final int METHOD_PADDING_LENGTH = 40;
     public static final long MAX_LOG_BYTES = 10000;
     private String logDir;
     private final String logFileName = "latest.log";
@@ -42,10 +42,11 @@ public class Logger {
 
     public void writeLog(String content) {
         try {
-            String invokeMethod = getInvokeMethodName(Thread.currentThread().getStackTrace());
-            String formattedContent = formatLogContent(invokeMethod, content);
-            File logFile = getLogFile();
-            rollLogFile(logFile);
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            String invokeClass = getInvokeClassName(stackTrace);
+            String invokeMethod = getInvokeMethodName(stackTrace);
+            String formattedContent = formatLogContent(invokeClass, invokeMethod, content);
+            rollLogFile(getLogFile());
             appendLogFile(formattedContent);
             System.out.println(formattedContent);
         } catch (IOException e) {
@@ -57,6 +58,10 @@ public class Logger {
         FileWriter fileWriter = new FileWriter(getLogFilePath(), true);
         fileWriter.write(formattedContent + "\n");
         fileWriter.close();
+    }
+
+    private String getInvokeClassName(StackTraceElement[] stackTraceElements) {
+        return stackTraceElements[2].getClassName();
     }
 
     public String getInvokeMethodName(StackTraceElement[] stackTraceElements) {
@@ -84,9 +89,9 @@ public class Logger {
     }
 
 
-    public String formatLogContent(String method, String content) {
+    public String formatLogContent(String className, String methodName, String content) {
         return "[" + getFormattedTime(new Date()) + "] " +
-                getRightPaddedString(method + "()", METHOD_PADDING_LENGTH) +
+                getRightPaddedString(className + "." + methodName + "()", METHOD_PADDING_LENGTH) +
                 content;
     }
 
