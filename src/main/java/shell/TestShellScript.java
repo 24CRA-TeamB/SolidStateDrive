@@ -22,7 +22,7 @@ public class TestShellScript {
             String command = getCommandFromUserInput(userInputArray);
             String[] arguments = getArgumentsFromUserInput(userInputArray);
 
-            logger.writeLog("command=" + command + "arguments=" + String.join(",", arguments));
+            logger.writeLog("command=" + command + " arguments=" + String.join(",", arguments));
             testShell.run(command, arguments);
         }
     }
