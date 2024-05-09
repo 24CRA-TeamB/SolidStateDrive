@@ -18,7 +18,9 @@ import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
 class LoggerTest {
-    public static final String TEST_LOG_PATH = "./TestLogPath";
+    public static final String TEST_LOG_PATH = ".";
+    public static final String TEST_LOG_FILE_NAME = "latest.log";
+    public static final String TEST_LOG_FILE = TEST_LOG_PATH + "/" + TEST_LOG_FILE_NAME;
     public static final String STOPPED_TIME = "24.03.11 07:12";
 
     Logger logger;
@@ -31,12 +33,12 @@ class LoggerTest {
         stoppedDate = new SimpleDateFormat(Logger.FORMAT_TIMESTAMP).parse(STOPPED_TIME);
         currentDate = new SimpleDateFormat(Logger.FORMAT_TIMESTAMP).format(new Date());
 
-        new File(TEST_LOG_PATH).delete();
+        new File(TEST_LOG_FILE).delete();
     }
 
     @AfterEach
     void tearDown() {
-        new File(TEST_LOG_PATH).delete();
+        new File(TEST_LOG_FILE).delete();
     }
 
     @Test
