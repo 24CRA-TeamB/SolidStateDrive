@@ -1,5 +1,7 @@
 package shell;
 
+import org.assertj.core.util.VisibleForTesting;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +29,8 @@ public class SSDExecutor {
         runCommand("E", lba, size);
     }
 
-    private void runCommand(String... args) {
+    @VisibleForTesting
+    void runCommand(String... args) {
         List<String> commands = new ArrayList<>(Arrays.asList("java", "-jar", jar));
         commands.addAll(Arrays.asList(args));
 
