@@ -220,7 +220,12 @@ class TestShellTest {
     }
 
     @Test
-    void exit() {
+    void flush() {
+        doNothing().when(mockSSDExecutor).flush();
+
+        testShell.flush(new String[]{});
+
+        verify(mockSSDExecutor, times(1)).flush();
     }
 
     @Test
