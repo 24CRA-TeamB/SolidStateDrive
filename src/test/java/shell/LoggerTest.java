@@ -146,7 +146,7 @@ class LoggerTest {
         List<String> actual = Files.readAllLines(Paths.get(TEST_LOG_FILE));
 
         assertEquals(repeat, actual.size());
-        String expected = "[" + currentDate + "] LoggerTest.writeLog()         Hello World!";
+        String expected = "[" + currentDate + "] shell.LoggerTest.writeLog()             Hello World!";
         actual.forEach(log -> assertEquals(expected, log));
     }
 
@@ -165,7 +165,7 @@ class LoggerTest {
     void formatLogContent() {
         String actual = logger.formatLogContent("LoggerTest", "formatLogContent", "Hello World!");
 
-        String expected = "[" + currentDate + "] LoggerTest.formatLogContent() Hello World!";
+        String expected = "[" + currentDate + "] LoggerTest.formatLogContent()           Hello World!";
         assertEquals(expected, actual);
     }
 
