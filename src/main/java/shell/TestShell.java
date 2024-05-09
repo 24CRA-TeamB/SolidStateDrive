@@ -19,6 +19,7 @@ public class TestShell {
     public static final String FULL_READ = "fullread";
     public static final String ERASE = "erase";
     public static final String ERASE_RANGE = "erase_range";
+    public static final String FLUSH = "flush";
     public static final String HELP = "help";
     public static final String EXIT = "exit";
     public static final String TESTAPP1 = "testapp1";
@@ -31,6 +32,7 @@ public class TestShell {
     private static final int NUMBER_OF_ARGUMENTS_FOR_FULLWRITE = 1;
     private static final int NUMBER_OF_ARGUMENTS_FOR_ERASE = 2;
     private static final int NUMBER_OF_ARGUMENTS_FOR_ERASE_RANGE = 2;
+    private static final int NUMBER_OF_ARGUMENTS_FOR_FLUSH = 0;
     private static final int NUMBER_OF_ARGUMENTS_FOR_HELP = 0;
     private static final int NUMBER_OF_ARGUMENTS_FOR_EXIT = 0;
     private static final int NUMBER_OF_ARGUMENTS_FOR_TESTAPP1 = 0;
@@ -67,6 +69,7 @@ public class TestShell {
             methodFactory.put(HELP, this.getClass().getDeclaredMethod("help", String[].class));
             methodFactory.put(ERASE, this.getClass().getDeclaredMethod("erase", String[].class));
             methodFactory.put(ERASE_RANGE, this.getClass().getDeclaredMethod("erase_range", String[].class));
+            methodFactory.put(FLUSH, this.getClass().getDeclaredMethod("flush", String[].class));
             methodFactory.put(EXIT, this.getClass().getDeclaredMethod("exit", String[].class));
             methodFactory.put(TESTAPP1, this.getClass().getDeclaredMethod("testapp1", String[].class));
             methodFactory.put(TESTAPP2, this.getClass().getDeclaredMethod("testapp2", String[].class));
@@ -213,6 +216,15 @@ public class TestShell {
             size -= MAX_ERASE_SIZE;
             lba += MAX_ERASE_SIZE;
         }
+    }
+
+    public void flush(String[] arguments) {
+        if (NUMBER_OF_ARGUMENTS_FOR_FLUSH != arguments.length) {
+            logger.writeLog("The number of arguments for flush should be " + NUMBER_OF_ARGUMENTS_FOR_FLUSH);
+            return;
+        }
+
+        ssdExecutor.flush();
     }
 
     private boolean isNotNumberFormat(String numberString) {

@@ -29,6 +29,10 @@ public class SSDExecutor {
         runCommand("E", lba, size);
     }
 
+    public void flush() {
+        runCommand("F");
+    }
+
     @VisibleForTesting
     void runCommand(String... args) {
         List<String> commands = new ArrayList<>(Arrays.asList("java", "-jar", jar));

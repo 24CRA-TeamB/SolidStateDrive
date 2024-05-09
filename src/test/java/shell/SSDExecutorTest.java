@@ -1,5 +1,6 @@
 package shell;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -46,5 +47,14 @@ class SSDExecutorTest {
         ssdExecutor.eraseData(lba, size);
 
         verify(ssdExecutor, times(1)).runCommand("E", lba, size);
+    }
+
+    @Test
+    void flush() {
+        doNothing().when(ssdExecutor).runCommand("F");
+
+        ssdExecutor.flush();
+
+        verify(ssdExecutor, times(1)).runCommand("F");
     }
 }
