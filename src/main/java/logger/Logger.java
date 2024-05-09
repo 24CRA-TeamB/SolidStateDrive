@@ -9,13 +9,15 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 public class Logger {
     private static final HashMap<String, Logger> loggerMap = new HashMap<>();
     private static final String logFormat = "";
-    static final long MAX_LOG_BYTES = 1000;
+    static final long MAX_LOG_BYTES = 10000;
     private String logPath;
 
     Logger() {
@@ -45,9 +47,10 @@ public class Logger {
     public void rollLogFile(File logFile) {
         try {
             if (isLogSizeFull(logFile)) {
-                File pastFile = getPastLogFileFrom(logFile);
-                if (pastFile != null) {
-                    compress(pastFile);
+                List<File> pastFiles = getPastLogFilesFrom(logFile);
+
+                for (File file : pastFiles) {
+                    compress(file);
                 }
 
                 changeLogFile(logFile);
@@ -67,16 +70,18 @@ public class Logger {
     }
 
     @VisibleForTesting
-    File getPastLogFileFrom(File file) throws IOException {
+    List<File> getPastLogFilesFrom(File file) throws IOException {
         File logDir = file.getParentFile();
+
+        List<File> pastFiles = new ArrayList<>();
 
         for (File pastFile : logDir.listFiles()) {
             if (isCompressible(pastFile) && compareFileTime(file, pastFile) < 0) {
-                return pastFile;
+                pastFiles.add(pastFile);
             }
         }
 
-        return null;
+        return pastFiles;
     }
 
     @VisibleForTesting

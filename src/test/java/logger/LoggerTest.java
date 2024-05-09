@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,7 +46,7 @@ class LoggerTest {
         setFileSize(lastestFile, MAX_LOG_BYTES + 1);
         spyLogger.rollLogFile(lastestFile);
 
-        verify(spyLogger, times(1)).getPastLogFileFrom(any());
+        verify(spyLogger, times(1)).getPastLogFilesFrom(any());
         verify(spyLogger, times(1)).compress(any());
         verify(spyLogger, times(1)).changeLogFile(any());
     }
@@ -60,21 +61,21 @@ class LoggerTest {
     }
 
     @Test
-    void getPastLogFileFromIfPathIsEmpty() throws IOException {
+    void getPastLogFilesFromIfPathIsEmpty() throws IOException {
         File dummy = tempDir.resolve("dummy").toFile();
-        File pastFile = logger.getPastLogFileFrom(dummy);
+        List<File> pastFile = logger.getPastLogFilesFrom(dummy);
 
-        assertThat(pastFile).isNull();
+        assertThat(pastFile).isEmpty();
     }
 
     @Test
-    void getPastLogFileFrom() throws IOException {
+    void getPastLogFilesFrom() throws IOException {
         File pastFile = createFile(tempDir.resolve(PAST_LOG));
         File lastestFile = createFile(tempDir.resolve(LATEST_LOG));
 
-        File file = logger.getPastLogFileFrom(lastestFile);
+        List<File> files = logger.getPastLogFilesFrom(lastestFile);
 
-        assertThat(file.getName()).isEqualTo(pastFile.getName());
+        files.forEach(file ->  assertThat(file.getName()).isEqualTo(pastFile.getName()));
     }
 
     @Test
