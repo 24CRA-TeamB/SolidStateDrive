@@ -17,20 +17,57 @@ import static logger.Logger.MAX_LOG_BYTES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+=======
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@ExtendWith(MockitoExtension.class)
 class LoggerTest {
     private static final String LATEST_LOG = "latest.log";
     private static final String PAST_LOG = "until_240101_00h_00m_00s.log";
     private static final String PAST_ZIP = "until_240101_00h_00m_00s.zip";
 
+    public static final String TEST_LOG_PATH = ".";
+    public static final String TEST_LOG_FILE_NAME = "latest.log";
+    public static final String TEST_LOG_FILE = TEST_LOG_PATH + "/" + TEST_LOG_FILE_NAME;
+    public static final String STOPPED_TIME = "24.03.11 07:12";
+
+    Logger logger;
+    Date stoppedDate;
+    String currentDate;
     Logger logger;
 
     @TempDir
     Path tempDir;
-
+  
     @BeforeEach
-    void setUp() {
-        logger = Logger.getInstance(tempDir.toString());
+    void setUp() throws ParseException {
+        logger = Logger.getInstance(TEST_LOG_PATH);
+        stoppedDate = new SimpleDateFormat(Logger.FORMAT_TIMESTAMP).parse(STOPPED_TIME);
+        currentDate = new SimpleDateFormat(Logger.FORMAT_TIMESTAMP).format(new Date());
+
+        new File(TEST_LOG_FILE).delete();
+    }
+
+    @AfterEach
+    void tearDown() {
+        new File(TEST_LOG_FILE).delete();
     }
 
     @Test
@@ -111,5 +148,39 @@ class LoggerTest {
         try (RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw")) {
             randomAccessFile.setLength(bytes);
         }
+
+    @ParameterizedTest
+    @ValueSource (ints = {1, 3, 5, 6})
+    void writeLog(int repeat) throws IOException {
+        String content = "Hello World!";
+
+        for (int i = 0; i < repeat; i++) {
+            logger.writeLog(content);
+        }
+
+        List<String> actual = Files.readAllLines(Paths.get(TEST_LOG_FILE));
+
+        assertEquals(repeat, actual.size());
+        String expected = "[" + currentDate + "] writeLog()                    Hello World!";
+        actual.forEach(log -> assertEquals(expected, log));
+    }
+
+    @Test
+    void getLogFile() throws IOException {
+        File file = logger.getLogFile();
+        assertTrue(file.exists());
+    }
+
+    @Test
+    void getFormattedTime() {
+        assertEquals(STOPPED_TIME, logger.getFormattedTime(stoppedDate));
+    }
+
+    @Test
+    void formatLogContent() {
+        String actual = logger.formatLogContent("formatLogContent", "Hello World!");
+
+        String expected = "[" + currentDate + "] formatLogContent()            Hello World!";
+        assertEquals(expected, actual);
     }
 }

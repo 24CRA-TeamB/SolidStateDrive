@@ -56,6 +56,13 @@ public class SamsungSSD implements SSDInterface{
     }
 
     @Override
+    public void erase(String lba, String size) {
+        for(int startLba = Integer.parseInt(lba); startLba<Integer.parseInt(size); startLba++){
+            write(String.valueOf(startLba), EMPTY_DATA_VALUE);
+        }
+    }
+
+    @Override
     public void write(String lba, String data) {
         if(!isValidData(data))
             throw new RuntimeException();

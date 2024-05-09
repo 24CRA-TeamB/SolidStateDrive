@@ -19,29 +19,52 @@ public class Logger {
     private static final String logFormat = "";
     static final long MAX_LOG_BYTES = 10000;
     private String logPath;
+    public static final String FORMAT_TIMESTAMP = "yy.MM.dd HH:mm";
+    public static final int METHOD_PADDING_LENGTH = 30;
+    private String logDir = "";
+    private String logFileName = "latest.log";
 
-    Logger() {
+    public Logger() {
         // for test
     }
-
-    private Logger(String logPath) {
-        this.logPath = logPath;
+  
+    private Logger(String logDir){
+        this.logDir = logDir;
     }
 
-    public static Logger getInstance(String filePath) {
-        if (loggerMap.containsKey(filePath) == false) {
-            Logger newLogger = new Logger(filePath);
-            loggerMap.put(filePath, newLogger);
+    public static Logger getInstance(String logDir) {
+        if (loggerMap.containsKey(logDir) == false) {
+            Logger newLogger = new Logger(logDir);
+            loggerMap.put(logDir, newLogger);
         }
 
-        return loggerMap.get(filePath);
+        return loggerMap.get(logDir);
     }
 
     public void writeLog(String content) {
+        try {
+            String invokeMethod = getInvokeMethodName(Thread.currentThread().getStackTrace());
+            String formattedContent = formatLogContent(invokeMethod, content);
+            getLogFile();
+            appendLogFile(formattedContent);
+            System.out.println(formattedContent);
+        } catch (IOException e) {
+            System.out.println("failed to write log");
+        }
     }
 
-    public File getLogFile() {
-        return new File("");
+    private void appendLogFile(String formattedContent) throws IOException {
+        FileWriter fileWriter = new FileWriter(logPath, true);
+        fileWriter.write(formattedContent + "\n");
+        fileWriter.close();
+    }
+
+    public String getInvokeMethodName(StackTraceElement[] stackTraceElements) {
+        return stackTraceElements[2].getMethodName();
+    }
+
+    private String getLogFilePath() {
+        return this.logDir + "/" + this.logFileName;
     }
 
     public void rollLogFile(File logFile) {
@@ -60,8 +83,28 @@ public class Logger {
         }
     }
 
-    public String formatting(String content) {
-        return content;
+    public String formatLogContent(String method, String content) {
+        return "[" + getFormattedTime(new Date()) + "] " +
+                getRightPaddedString(method + "()", METHOD_PADDING_LENGTH) +
+                content;
+    }
+
+    public String getFormattedTime(Date date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy.MM.dd HH:mm");
+        return simpleDateFormat.format(date);
+    }
+
+    private String getRightPaddedString(String content, int padLength) {
+        return String.format("%1$-" + padLength + "s", content);
+    }
+
+    public File getLogFile() throws IOException {
+        System.out.println(getLogFilePath());
+        File logFile = new File(getLogFilePath());
+        if (!logFile.exists()) {
+            logFile.createNewFile();
+        }
+        return logFile;
     }
 
     @VisibleForTesting
