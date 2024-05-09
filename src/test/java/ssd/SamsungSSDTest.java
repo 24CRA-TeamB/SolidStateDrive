@@ -4,73 +4,47 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.*;
 
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class SamsungSSDTest {
     public static final String READ_DATA_TARGET_FILE = "./nand.txt";
     public static final String SAMPLE_DATA_JSON_STRING = "[{\"data\":\"0x00000000\",\"lba\":\"0\"}, {\"data\":\"0x00000000\",\"lba\":\"1\"}]";
 
-    @Mock
-    SSDInterface ssdInterfaceMock;
-
-    DeviceDriver deviceDriverMock;
-
-    DeviceDriver deviceDriver;
-
-    Command command;
-
-    SSDInterface ssd;
-
-    @BeforeEach
-    void setUp() {
-        ssd = new SamsungSSD();
-        deviceDriverMock = new DeviceDriver(ssdInterfaceMock);
-        deviceDriver = new DeviceDriver(new SamsungSSD());
-        command = new Command();
-    }
-
     @Test
     @Disabled("Command Factory에서 Invalid Argument Check 하도록 변경하여, 불가능한 Test Case로 판명")
     void readInvalidArgumentMinusLBATest(){
-        command.setLba("-1");
-        deviceDriverMock.readData(command);
-        verify(ssdInterfaceMock, times(0)).read(command);
+        Command command = new CommandRead("R", "-1");
+        command.execute();
     }
 
     @Test
     @Disabled("Command Factory에서 Invalid Argument Check 하도록 변경하여, 불가능한 Test Case로 판명")
     void readInvalidArgumentOverMaxLBATest(){
-        command.setLba("100");
-        deviceDriverMock.readData(command);
-        verify(ssdInterfaceMock, times(0)).read(command);
+        Command command = new CommandRead("R", "100");
+        command.execute();
     }
 
     @Test
     @Disabled("Command Factory에서 Invalid Argument Check 하도록 변경하여, 불가능한 Test Case로 판명")
     void readInterfaceLbaData(){
-        command.setLba("14");
-        deviceDriverMock.readData(command);
-        verify(ssdInterfaceMock, times(1)).read(command);
+        Command command = new CommandRead("R", "14");
+        command.execute();
     }
 
     @Test
     void readLbaData(){
-        command.setLba("4");
-        deviceDriver.readData(command);
+        Command command = new CommandRead("R", "4");
+        command.execute();
     }
 
     @Test
-    @DisplayName("SamsungSSD 객체가 정상적으로 생성된다")
-    void createSamsungSSD(){
-        assertThat(ssd).isNotNull();
+    void createCommandFactory(){
+        assertThat(CommandFactory.getInstance()).isNotNull();
     }
 
     @Test
@@ -78,9 +52,8 @@ class SamsungSSDTest {
     void writeThrowRuntimeExceptionWhenDataValueExceedInteger(){
         try {
             // when
-            command.setLba("3");
-            command.setValue("0x1298CDXF");
-            ssd.write(command);
+            Command command = new CommandWrite("W", "1", "0x1298CDXF");
+            command.execute();
             fail();
         } catch(RuntimeException e) {
             // then
@@ -94,8 +67,8 @@ class SamsungSSDTest {
     void writeThrowRuntimeExceptionWhenLbaValueExceedInteger(){
         try {
             // when
-            command.setLba("-1");
-            command.setValue("0x12345678");
+            Command command = new CommandWrite("W", "-1", "0x12345678");
+            command.execute();
             fail();
         } catch(RuntimeException e) {
             // then
@@ -107,9 +80,8 @@ class SamsungSSDTest {
     @DisplayName("data 값에 prefix 0x 값이 아닌 경우 RuntimeException")
     void writeThrowRuntimeExceptionWhenPrefixValueIsNot0x(){
         try {
-            command.setLba("1");
-            command.setValue("0012345678");
-            ssd.write(command);
+            Command command = new CommandWrite("W", "1", "0012345678");
+            command.execute();
         } catch(RuntimeException e) {
             assertThat(e).isInstanceOf(RuntimeException.class);
         }
@@ -126,9 +98,8 @@ class SamsungSSDTest {
         }
 
         // when
-        command.setLba("1");
-        command.setValue("0x12345678");
-        ssd.write(command);
+        Command command = new CommandWrite("W", "1", "0x12345678");
+        command.execute();
 
         // then
         File nandTxt = new File(READ_DATA_TARGET_FILE);
@@ -143,9 +114,8 @@ class SamsungSSDTest {
             createSampleNandTxt();
 
             // when
-            command.setLba("1");
-            command.setValue("0x12345678");
-            ssd.write(command);
+            Command command = new CommandWrite("W", "1", "0x12345678");
+            command.execute();
 
             // then
             FileReader fileReader = new FileReader(READ_DATA_TARGET_FILE);

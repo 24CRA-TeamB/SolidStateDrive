@@ -1,45 +1,71 @@
 package ssd;
 
-public class Command {
-    private String cmd = "";
-    private String lba = "";
-    private String value = "";
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+abstract class Command {
+
+    public static final String EMPTY_DATA_VALUE = "0x00000000";
+    public static final String NAND_TXT_PATH = "./nand.txt";
+    public static final String RESULT_TXT_PATH = "./result.txt";
+
+    abstract void execute();
 
     public Command() {
+        createNandTextFile();
+        initResultFile();
     }
 
-    public Command(String cmd, String lba) {
-        this.cmd = cmd;
-        this.lba = lba;
+    private void createNandTextFile() {
+        if(!doesNandFileExist()) {
+            createNandFile();
+        }
     }
 
-    public Command(String cmd, String lba, String value) {
-        this.cmd = cmd;
-        this.lba = lba;
-        this.value = value;
+    private boolean doesNandFileExist() {
+        File nandTxt = new File(NAND_TXT_PATH);
+        return nandTxt.exists();
     }
 
-    public String getCmd() {
-        return cmd;
+    private void createNandFile() {
+        File nandTxtFile = new File(NAND_TXT_PATH);
+        try {
+            if(nandTxtFile.createNewFile()){
+                JSONArray jsonArray = new JSONArray();
+                for(int idx = 0; idx < 100; ++idx){
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("lba", Integer.toString(idx));
+                    jsonObject.put("data", EMPTY_DATA_VALUE);
+                    jsonArray.put(jsonObject);
+                }
+                writeJsonArrayToNandTxtPath(jsonArray);
+            }
+        } catch (IOException e) {
+            System.out.println("파일을 생성하는 도중 오류가 발생했습니다.");
+        }
     }
 
-    public String getLba() {
-        return lba;
+    private void writeJsonArrayToNandTxtPath(JSONArray jsonArray) throws IOException {
+        FileWriter fileWriter = new FileWriter(NAND_TXT_PATH);
+        fileWriter.write(jsonArray.toString());
+        fileWriter.close();
     }
 
-    public String getValue() {
-        return value;
+    private void initResultFile() {
+        writeResultFile("");
     }
 
-    public void setCmd(String cmd) {
-        this.cmd = cmd;
-    }
-
-    public void setLba(String lba) {
-        this.lba = lba;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
+    private void writeResultFile(String readValue) {
+        try {
+            FileWriter writer = new FileWriter(RESULT_TXT_PATH);
+            writer.write(readValue);
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("파일 쓰기 중 오류가 발생했습니다: " + e.getMessage());
+        }
     }
 }
