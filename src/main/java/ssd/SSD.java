@@ -4,7 +4,7 @@ public class SSD {
 
     static DeviceDriver deviceDriver;
     static CommandFactory commandFactory;
-    static Buffer buffer;
+    static CommandBuffer commandBuffer;
 
     public SSD(SSDInterface ssdInterface) {
         deviceDriver = new DeviceDriver(ssdInterface);
@@ -13,15 +13,16 @@ public class SSD {
     public static void main(String[] args) {
         deviceDriver = new DeviceDriver(new SamsungSSD());
         commandFactory = CommandFactory.getInstance();
-        buffer = new Buffer();
+        commandBuffer = new CommandBuffer();
 
         Command command = commandFactory.makeCommand(args);
         if(command == null) return;
 
-        buffer.addCommand(command);
+        commandBuffer.addCommand(command);
 
-        if(buffer.full() || args[0].equals("F")){
-            flush(buffer);
+        // flush 면 ADD 안 하고 flush 수행
+        if(commandBuffer.full() || args[0].equals("F")){
+            flush(commandBuffer);
         }
     }
 
@@ -39,9 +40,9 @@ public class SSD {
         }
     }
 
-    private static void flush(Buffer buffer){
-        while(!buffer.empty()){
-            Command bufferedCommand = buffer.getCommand();
+    private static void flush(CommandBuffer commandBuffer){
+        while(!commandBuffer.empty()){
+            Command bufferedCommand = commandBuffer.getCommand();
             doCommand(bufferedCommand);
         }
     }

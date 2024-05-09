@@ -1,17 +1,21 @@
 package ssd;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Buffer {
+public class CommandBuffer {
     private String BUFFER_PATH = "./buffer.txt";
     List<Command> commands;
 
-    public Buffer(){
+    public CommandBuffer(){
+        this.commands = new ArrayList<>();
+
         BufferedReader bufferedReader = null;
         StringBuilder stringBuilder = new StringBuilder();
         try {
@@ -22,7 +26,11 @@ public class Buffer {
             throw new RuntimeException(e.getMessage() + " buffer.txt 없습니다.");
         }
 
-        this.commands = new ArrayList<>();
+        JSONArray jasonArray = new JSONArray(stringBuilder.toString());
+        for(int i = 0; i < jasonArray.length(); i++){
+            Command command = getCommandFromJsonObject(jasonArray.getJSONObject(i));
+            this.commands.add(command);
+        }
     }
 
     public void addCommand(Command command){
@@ -39,6 +47,8 @@ public class Buffer {
     }
 
     public Command getCommand(){
+        // empty 일 때는 null 리턴하도록 변경
+
         Command command = this.commands.get(0);
         commands.remove(0);
         return command;
@@ -46,5 +56,12 @@ public class Buffer {
 
     private void optimize(){
 
+    }
+
+    private Command getCommandFromJsonObject(JSONObject jsonObject){
+        String cmd = jsonObject.getString("cmd");
+        String lba = jsonObject.getString("lba");
+        String value = jsonObject.getString("value");
+        return new Command(cmd, lba, value);
     }
 }
