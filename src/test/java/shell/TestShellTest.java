@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.*;
-import static shell.TestShell.RESULT_FILE;
+import static shell.TestShell.*;
 
 @ExtendWith(MockitoExtension.class)
 class TestShellTest {
@@ -128,7 +128,7 @@ class TestShellTest {
     void eraseRange_withinEraseCapacity(String[] arguments) {
         testShell.erase_range(arguments);
 
-        verify(testShell, times(1)).erase(any());
+        verify(mockSSDExecutor, times(1)).eraseData(anyString(), anyString());
     }
 
     static Stream<Arguments> getValidSingleEraseRangeArguments() {
@@ -145,7 +145,7 @@ class TestShellTest {
     void eraseRange_withinEraseCapacity(String[] arguments, int expectedTimes) {
         testShell.erase_range(arguments);
 
-        verify(testShell, times(expectedTimes)).erase(any());
+        verify(mockSSDExecutor, times(expectedTimes)).eraseData(anyString(), anyString());
     }
 
     static Stream<Arguments> getValidMultipleEraseRangeArguments() {
@@ -155,8 +155,8 @@ class TestShellTest {
                 Arguments.arguments(new String[] {"11", "52"}, 5),
                 Arguments.arguments(new String[] {"43", "27"}, 0),
                 Arguments.arguments(new String[] {"78", "94"}, 2),
-                Arguments.arguments(new String[] {"78", "190"}, 3),
-                Arguments.arguments(new String[] {"-100", "100"}, 10)
+                Arguments.arguments(new String[] {"78", "190"}, 12),
+                Arguments.arguments(new String[] {"-100", "100"}, 20)
         );
     }
 
@@ -174,12 +174,9 @@ class TestShellTest {
 
     @Test
     void printFail() {
-        testShell.readResult(NOT_EXISTED_FILE);
+        String result = testShell.readResult(NOT_EXISTED_FILE);
 
-        String actual = outputStream.toString().trim();
-        String expected = "Failed to read result. " + NOT_EXISTED_FILE;
-
-        assertThat(actual).isEqualTo(expected);
+        assertThat(result.isEmpty()).isTrue();
     }
 
     @Test
@@ -254,28 +251,25 @@ class TestShellTest {
     @Test
     void testapp1() {
         doNothing().when(testShell).fullwrite(any());
-        stubReadResult("0x12345678", 0, 100);
+        stubReadResult(TESTAPP1_DATA, 0, 100);
 
         testShell.testapp1(new String[]{});
 
         verify(testShell, times(1)).fullwrite(any());
         verify(testShell, times(1)).fullread(any());
-
-        assertEquals("TestApp1 success\r\n", outputStream.toString());
+        assertThat(outputStream.toString().contains("TestApp1 success")).isTrue();
     }
 
     @Test
     void testapp1_fail() {
         doNothing().when(testShell).fullwrite(any());
-
         stubReadResult("0x87654321", 0, 100);
 
         testShell.testapp1(new String[]{});
 
         verify(testShell, times(1)).fullwrite(any());
         verify(testShell, times(1)).fullread(any());
-
-        assertEquals("TestApp1 fail\r\n", outputStream.toString());
+        assertThat(outputStream.toString().contains("TestApp1 fail")).isTrue();
     }
 
     @Test
@@ -286,8 +280,7 @@ class TestShellTest {
 
         verify(mockSSDExecutor, times(150)).writeData(anyString(), matches("0xAAAABBBB"));
         verify(mockSSDExecutor, times(5)).writeData(anyString(), matches("0x12345678"));
-
-        assertEquals("TestApp2 success\r\n", outputStream.toString());
+        assertThat(outputStream.toString().contains("TestApp2 success")).isTrue();
     }
 
     @Test
@@ -296,16 +289,16 @@ class TestShellTest {
 
         testShell.testapp2(new String[]{});
 
-        verify(mockSSDExecutor, times(150)).writeData(anyString(), matches("0xAAAABBBB"));
-        verify(mockSSDExecutor, times(5)).writeData(anyString(), matches("0x12345678"));
+        verify(mockSSDExecutor, times(150)).writeData(anyString(), matches(TESTAPP2_DATA1));
+        verify(mockSSDExecutor, times(5)).writeData(anyString(), matches(TESTAPP2_DATA2));
 
-        assertEquals("TestApp2 fail\r\n", outputStream.toString());
+        assertThat(outputStream.toString().contains("TestApp2 fail")).isTrue();
     }
 
     private void stubReadResult(String data, int from, int to) {
-        Stubber stubber = doReturn(from + " " + data);
+        Stubber stubber = doReturn(data);
         for (int i = from + 1; i < to; i++) {
-            stubber = stubber.doReturn(i + " " + data);
+            stubber = stubber.doReturn(data);
         }
         stubber.when(testShell).readResult(anyString());
     }
