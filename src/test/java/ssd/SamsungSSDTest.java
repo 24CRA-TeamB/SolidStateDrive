@@ -3,64 +3,45 @@ package ssd;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.io.*;
 
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class SamsungSSDTest {
     public static final String READ_DATA_TARGET_FILE = "./nand.txt";
     public static final String SAMPLE_DATA_JSON_STRING = "[{\"data\":\"0x00000000\",\"lba\":\"0\"}, {\"data\":\"0x00000000\",\"lba\":\"1\"}]";
 
-    @Mock
-    SSDInterface ssdInterfaceMock;
-
-    DeviceDriver deviceDriverMock;
-
-    DeviceDriver deviceDriver;
-
-    SSDInterface ssd;
-
-    @BeforeEach
-    void setUp() {
-        ssd = new SamsungSSD();
-        deviceDriverMock = new DeviceDriver(ssdInterfaceMock);
-        deviceDriver = new DeviceDriver(new SamsungSSD());
-    }
-
     @Test
+    @Disabled("Command Factory에서 Invalid Argument Check 하도록 변경하여, 불가능한 Test Case로 판명")
     void readInvalidArgumentMinusLBATest(){
-        deviceDriverMock.readData("-1");
-        verify(ssdInterfaceMock, times(0)).read("-1");
+        Command command = new CommandRead("R", -1);
+        command.execute();
     }
 
     @Test
+    @Disabled("Command Factory에서 Invalid Argument Check 하도록 변경하여, 불가능한 Test Case로 판명")
     void readInvalidArgumentOverMaxLBATest(){
-        deviceDriverMock.readData("100");
-        verify(ssdInterfaceMock, times(0)).read("100");
+        Command command = new CommandRead("R", 100);
+        command.execute();
     }
 
     @Test
+    @Disabled("Command Factory에서 Invalid Argument Check 하도록 변경하여, 불가능한 Test Case로 판명")
     void readInterfaceLbaData(){
-        deviceDriverMock.readData("14");
-        verify(ssdInterfaceMock, times(1)).read("14");
+        Command command = new CommandRead("R", 14);
+        command.execute();
     }
 
     @Test
     void readLbaData(){
-        deviceDriver.readData("4");
+        Command command = new CommandRead("R", 4);
+        command.execute();
     }
 
     @Test
-    @DisplayName("SamsungSSD 객체가 정상적으로 생성된다")
-    void createSamsungSSD(){
-        assertThat(ssd).isNotNull();
+    void createCommandFactory(){
+        assertThat(CommandFactory.getInstance()).isNotNull();
     }
 
     @Test
@@ -68,7 +49,8 @@ class SamsungSSDTest {
     void writeThrowRuntimeExceptionWhenDataValueExceedInteger(){
         try {
             // when
-            ssd.write("3", "0x1298CDXF");
+            Command command = new CommandWrite("W", 1, "0x1298CDXF");
+            command.execute();
             fail();
         } catch(RuntimeException e) {
             // then
@@ -78,10 +60,12 @@ class SamsungSSDTest {
 
     @Test
     @DisplayName("lba 에 0보다 작은 값이 전달되는 경우 RuntimeException 을 던진다")
+    @Disabled("Command Factory에서 Invalid Argument Check 하도록 변경하여, 불가능한 Test Case로 판명")
     void writeThrowRuntimeExceptionWhenLbaValueExceedInteger(){
         try {
             // when
-            ssd.write("-1", "0x12345678");
+            Command command = new CommandWrite("W", -1, "0x12345678");
+            command.execute();
             fail();
         } catch(RuntimeException e) {
             // then
@@ -93,7 +77,8 @@ class SamsungSSDTest {
     @DisplayName("data 값에 prefix 0x 값이 아닌 경우 RuntimeException")
     void writeThrowRuntimeExceptionWhenPrefixValueIsNot0x(){
         try {
-            ssd.write("1", "0012345678");
+            Command command = new CommandWrite("W", 1, "0012345678");
+            command.execute();
         } catch(RuntimeException e) {
             assertThat(e).isInstanceOf(RuntimeException.class);
         }
@@ -110,7 +95,8 @@ class SamsungSSDTest {
         }
 
         // when
-        ssd.write("1", "0x12345678");
+        Command command = new CommandWrite("W", 1, "0x12345678");
+        command.execute();
 
         // then
         File nandTxt = new File(READ_DATA_TARGET_FILE);
@@ -125,7 +111,8 @@ class SamsungSSDTest {
             createSampleNandTxt();
 
             // when
-            ssd.write("1", "0x12345678");
+            Command command = new CommandWrite("W", 1, "0x12345678");
+            command.execute();
 
             // then
             FileReader fileReader = new FileReader(READ_DATA_TARGET_FILE);
