@@ -10,6 +10,7 @@ import java.util.List;
 public class CommandBuffer {
     public static final int MAX_BUFFER_SIZE = 10;
     private static final String BUFFER_TXT_PATH = "./buffer.txt";
+    protected static final Logger logger = Logger.getInstance("./ssd");
 
     private final List<Command> commands;
     private final CommandFactory commandFactory;
@@ -116,7 +117,11 @@ public class CommandBuffer {
             fileWriter.write(jsonArray.toString());
             fileWriter.close();
         } catch (IOException e){
-            System.out.println("Error 발생");
+            logger.writeLog("[ERROR] buffer.txt Write 도중 문제가 발생했습니다.");
         }
+    }
+
+    public void flush() {
+        logger.writeLog("[SUCCESS] Flush");
     }
 }

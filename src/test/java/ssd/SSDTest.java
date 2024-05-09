@@ -397,6 +397,15 @@ class SSDTest {
             args[0] = "F";
             SSD.main(args);
         }
+
+        @Test
+        @Order(6)
+        void mainWithFlushWrongArgument01(){
+            String[] args = new String[2];
+            args[0] = "F";
+            args[1] = "1";
+            SSD.main(args);
+        }
     }
 
     private void setWriteCommand(String writeCode, String lba, String data){

@@ -14,8 +14,7 @@ public class SSD {
 
         CommandCode cmdCode = CommandCode.valueOf(args[0]);
         if(cmdCode.equals(CommandCode.F)){
-            buffer.execute();
-            buffer.clearHistory();
+            buffer.flush();
         }
         else if(cmdCode.equals(CommandCode.R)){
             buffer.execute();
