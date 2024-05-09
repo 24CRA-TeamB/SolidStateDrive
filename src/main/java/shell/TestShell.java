@@ -86,7 +86,7 @@ public class TestShell {
         logger.writeLog("command=" + command);
         Method method = getMethod(command);
         try {
-            method.invoke(arguments);
+            method.invoke(this, (Object) arguments);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
