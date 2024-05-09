@@ -24,7 +24,6 @@ public class TestShell {
     public static final String TESTAPP1 = "testapp1";
     public static final String TESTAPP2 = "testapp2";
     public static final String INVALID_COMMAND = "invalid_command";
-    private static final String[] EMPTY_ARGUMENTS = new String[]{};
 
     private static final int NUMBER_OF_ARGUMENTS_FOR_READ = 1;
     private static final int NUMBER_OF_ARGUMENTS_FOR_FULLREAD = 0;
@@ -40,6 +39,10 @@ public class TestShell {
     public static final int NUMBER_OF_LBA = 100;
     private static final int MAX_ERASE_SIZE = 10;
     static final String RESULT_FILE = "result.txt";
+    public static final String TESTAPP1_DATA = "0x12345678";
+    public static final String TESTAPP2_DATA1 = "0xAAAABBBB";
+    public static final String TESTAPP2_DATA2 = "0xAAAABBBB";
+    private static final String[] EMPTY_ARGUMENTS = new String[]{};
     private final HashMap<String, Method> methodFactory = new HashMap<>();
     private SSDExecutor ssdExecutor;
     private static final Logger logger = Logger.getInstance("./shell");
@@ -86,7 +89,7 @@ public class TestShell {
         logger.writeLog("command=" + command);
         Method method = getMethod(command);
         try {
-            method.invoke(arguments);
+            method.invoke(this, (Object) arguments);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
@@ -94,7 +97,7 @@ public class TestShell {
 
     public void write(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_WRITE != arguments.length) {
-            logger.writeLog("The number of arguments for write should be " + arguments.length);
+            logger.writeLog("The number of arguments for write should be " + NUMBER_OF_ARGUMENTS_FOR_WRITE);
             return;
         }
 
@@ -103,7 +106,7 @@ public class TestShell {
 
     public void fullwrite(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_FULLWRITE != arguments.length) {
-            logger.writeLog("The number of arguments for fullwrite should be " + arguments.length);
+            logger.writeLog("The number of arguments for fullwrite should be " + NUMBER_OF_ARGUMENTS_FOR_FULLWRITE);
             return;
         }
 
@@ -114,7 +117,7 @@ public class TestShell {
 
     public String read(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_READ != arguments.length) {
-            logger.writeLog("The number of arguments for read should be " + arguments.length);
+            logger.writeLog("The number of arguments for read should be " + NUMBER_OF_ARGUMENTS_FOR_READ);
             return "";
         }
 
@@ -124,7 +127,7 @@ public class TestShell {
 
     public void readAndPrint(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_READ != arguments.length) {
-            logger.writeLog("The number of arguments for read should be " + arguments.length);
+            logger.writeLog("The number of arguments for read should be " + NUMBER_OF_ARGUMENTS_FOR_READ);
             return;
         }
 
@@ -140,7 +143,7 @@ public class TestShell {
     public ArrayList<String> fullread(String[] arguments) {
         ArrayList<String> result = new ArrayList<>();
         if (NUMBER_OF_ARGUMENTS_FOR_FULLREAD != arguments.length) {
-            logger.writeLog("The number of arguments for fullread should be " + arguments.length);
+            logger.writeLog("The number of arguments for fullread should be " + NUMBER_OF_ARGUMENTS_FOR_FULLREAD);
             return result;
         }
 
@@ -154,7 +157,7 @@ public class TestShell {
 
     public void fullreadAndPrint(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_FULLREAD != arguments.length) {
-            logger.writeLog("The number of arguments for fullread should be " + arguments.length);
+            logger.writeLog("The number of arguments for fullread should be " + NUMBER_OF_ARGUMENTS_FOR_FULLREAD);
             return;
         }
 
@@ -163,7 +166,7 @@ public class TestShell {
 
     public void erase(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_ERASE != arguments.length) {
-            logger.writeLog("The number of arguments for erase should be " + arguments.length);
+            logger.writeLog("The number of arguments for erase should be " + NUMBER_OF_ARGUMENTS_FOR_ERASE);
             return;
         }
 
@@ -184,7 +187,7 @@ public class TestShell {
 
     public void erase_range(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_ERASE_RANGE != arguments.length) {
-            logger.writeLog("The number of arguments for erase_range should be " + arguments.length);
+            logger.writeLog("The number of arguments for erase_range should be " + NUMBER_OF_ARGUMENTS_FOR_ERASE_RANGE);
             return;
         }
 
@@ -224,7 +227,7 @@ public class TestShell {
 
     public void exit(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_EXIT != arguments.length) {
-            logger.writeLog("The number of arguments for exit should be " + arguments.length);
+            logger.writeLog("The number of arguments for exit should be " + NUMBER_OF_ARGUMENTS_FOR_EXIT);
             return;
         }
 
@@ -234,7 +237,7 @@ public class TestShell {
 
     public void help(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_HELP != arguments.length) {
-            logger.writeLog("The number of arguments for help should be " + arguments.length);
+            logger.writeLog("The number of arguments for help should be " + NUMBER_OF_ARGUMENTS_FOR_HELP);
             return;
         }
 
@@ -249,29 +252,29 @@ public class TestShell {
 
     public void testapp1(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_TESTAPP1 != arguments.length) {
-            logger.writeLog("The number of arguments for testapp1 should be " + arguments.length);
+            logger.writeLog("The number of arguments for testapp1 should be " + NUMBER_OF_ARGUMENTS_FOR_TESTAPP1);
             return;
         }
 
-        fullwrite(new String[]{"0x12345678"});
-        ArrayList<String> result = fullread(new String[]{});
+        fullwrite(new String[]{TESTAPP1_DATA});
+        ArrayList<String> result = fullread(EMPTY_ARGUMENTS);
         verifyTestApp1(result);
     }
 
     public void testapp2(String[] arguments) {
         if (NUMBER_OF_ARGUMENTS_FOR_TESTAPP2 != arguments.length) {
-            logger.writeLog("The number of arguments for testapp2 should be " + arguments.length);
+            logger.writeLog("The number of arguments for testapp2 should be " + NUMBER_OF_ARGUMENTS_FOR_TESTAPP2);
             return;
         }
 
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 30; j++) {
-                write(new String[]{Integer.toString(i), "0xAAAABBBB"});
+                write(new String[]{Integer.toString(i), TESTAPP2_DATA1});
             }
         }
 
         for (int i = 0; i < 5; i++) {
-            write(new String[]{Integer.toString(i), "0x12345678"});
+            write(new String[]{Integer.toString(i), TESTAPP2_DATA2});
         }
 
         ArrayList<String> result = new ArrayList<>();
@@ -288,7 +291,7 @@ public class TestShell {
         }
 
         for (int i = 0; i < NUMBER_OF_LBA; i++) {
-            String expected = i + " " + "0x12345678";
+            String expected = TESTAPP1_DATA;
             if (expected.equals(result.get(i)) == false) {
                 logger.writeLog("TestApp1 fail");
                 return;
@@ -304,7 +307,7 @@ public class TestShell {
         }
 
         for (int i = 0; i < 5; i++) {
-            String expected = i + " " + "0x12345678";
+            String expected = TESTAPP2_DATA2;
             if (expected.equals(result.get(i)) == false) {
                 logger.writeLog("TestApp2 fail");
                 return;

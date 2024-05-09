@@ -2,7 +2,9 @@ package ssd;
 
 import org.assertj.core.util.VisibleForTesting;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
@@ -42,7 +44,8 @@ public class Logger {
         try {
             String invokeMethod = getInvokeMethodName(Thread.currentThread().getStackTrace());
             String formattedContent = formatLogContent(invokeMethod, content);
-            getLogFile();
+            File logFile = getLogFile();
+            rollLogFile(logFile);
             appendLogFile(formattedContent);
         } catch (IOException e) {
             System.out.println("failed to write log");
@@ -56,7 +59,7 @@ public class Logger {
     }
 
     public String getInvokeMethodName(StackTraceElement[] stackTraceElements) {
-        return stackTraceElements[2].getClassName()+"."+stackTraceElements[2].getMethodName();
+        return stackTraceElements[2].getMethodName();
     }
 
     private String getLogFilePath() {
