@@ -32,6 +32,7 @@ public class CommandBuffer {
 
     public void addCommand(Command command){
         this.commands.add(command);
+        logger.writeLog("[SUCCESS] command added to buffer");
         optimize();
     }
 
