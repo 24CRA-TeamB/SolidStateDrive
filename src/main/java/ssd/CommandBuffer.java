@@ -126,7 +126,7 @@ public class CommandBuffer {
         logger.writeLog("[SUCCESS] -------- Flush Start --------- ");
         execute();
         clearHistory();
-        logger.writeLog("[SUCCESS] -------- Flush Start --------- ");
+        logger.writeLog("[SUCCESS] -------- Flush End --------- ");
     }
 
     public void read(Command command, String lba) {
