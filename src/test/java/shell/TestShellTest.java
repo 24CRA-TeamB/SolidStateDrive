@@ -155,8 +155,8 @@ class TestShellTest {
                 Arguments.arguments(new String[] {"11", "52"}, 5),
                 Arguments.arguments(new String[] {"43", "27"}, 0),
                 Arguments.arguments(new String[] {"78", "94"}, 2),
-                Arguments.arguments(new String[] {"78", "190"}, 12),
-                Arguments.arguments(new String[] {"-100", "100"}, 20)
+                Arguments.arguments(new String[] {"78", "190"}, 3),
+                Arguments.arguments(new String[] {"-100", "100"}, 10)
         );
     }
 

@@ -205,16 +205,19 @@ public class TestShell {
     }
 
     private void eraseSplit(int lba, int size) {
+        if (lba < 0) {
+            size += lba;
+            lba = 0;
+        }
+
+        size = Math.min(size, NUMBER_OF_LBA - lba);
+
         while (size > 0) {
             int eraseSize = Math.min(size, MAX_ERASE_SIZE);
 
-            if (lba + eraseSize > NUMBER_OF_LBA) {
-                eraseSize = NUMBER_OF_LBA - lba;
-            }
-
             ssdExecutor.eraseData(String.valueOf(lba), String.valueOf(eraseSize));
-            size -= MAX_ERASE_SIZE;
-            lba += MAX_ERASE_SIZE;
+            size -= eraseSize;
+            lba += eraseSize;
         }
     }
 
